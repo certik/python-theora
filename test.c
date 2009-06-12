@@ -45,6 +45,7 @@ int main()
     int theora_p = 0;
     int stateflag = 0;
     ogg_packet op;
+    th_dec_ctx *td;
 
     th_setup_info *setup=NULL;
 
@@ -107,5 +108,14 @@ int main()
         }
     }
     dump_comments(&tc);
+    fprintf(stderr,"Ogg logical stream %lx is Theora %dx%d %.02f fps video\n"
+        "Encoded frame content is %dx%d with %dx%d offset\n"
+        "Aspect: %d:%d\n",
+        to.serialno, ti.pic_width, ti.pic_height,
+        (double)ti.fps_numerator/ti.fps_denominator,
+        ti.frame_width, ti.frame_height, ti.pic_x, ti.pic_y,
+        ti.aspect_numerator, ti.aspect_denominator);
+
+    td = th_decode_alloc(&ti, setup);
     return 0;
 }
