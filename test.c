@@ -35,6 +35,36 @@ static int dump_comments(th_comment *tc) {
   return 0;
 }
 
+/* write out the planar YUV frame, uncropped */
+static void video_write(th_dec_ctx *td)
+{
+    int r;
+    th_ycbcr_buffer ycbcr;
+    if (th_decode_ycbcr_out(td, ycbcr) != 0) {
+        printf("th_decode_ycbcr_out failed\n");
+    }
+    printf("w: %d, h: %d, stride: %d\n", ycbcr[0].width, ycbcr[0].height,
+            ycbcr[0].stride);
+    printf("w: %d, h: %d, stride: %d\n", ycbcr[1].width, ycbcr[1].height,
+            ycbcr[1].stride);
+    printf("w: %d, h: %d, stride: %d\n", ycbcr[2].width, ycbcr[2].height,
+            ycbcr[2].stride);
+
+/*
+  int i;
+  if(outfile){
+    if(!raw)
+      fprintf(outfile, "FRAME\n");
+    for(i=0;i<yuv.y_height;i++)
+      fwrite(yuv.y+yuv.y_stride*i, 1, yuv.y_width, outfile);
+    for(i=0;i<yuv.uv_height;i++)
+      fwrite(yuv.u+yuv.uv_stride*i, 1, yuv.uv_width, outfile);
+    for(i=0;i<yuv.uv_height;i++)
+      fwrite(yuv.v+yuv.uv_stride*i, 1, yuv.uv_width, outfile);
+  }
+*/
+}
+
 int main()
 {
     ogg_sync_state oy;
@@ -141,7 +171,7 @@ int main()
             while (ogg_sync_pageout(&oy, &og) > 0)
                 ogg_stream_pagein(&to, &og);
         } else {
-            // video_write()
+            video_write(td);
         }
         videobuf_ready = 0;
     }
