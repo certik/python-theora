@@ -46,6 +46,10 @@ int main()
     int stateflag = 0;
     ogg_packet op;
     th_dec_ctx *td;
+    int videobuf_ready = 0;
+    ogg_int64_t videobuf_granulepos = -1;
+    double videobuf_time=0;
+    int frames=0;
 
     th_setup_info *setup=NULL;
 
@@ -117,5 +121,36 @@ int main()
         ti.aspect_numerator, ti.aspect_denominator);
 
     td = th_decode_alloc(&ti, setup);
+    stateflag = 0;
+    while (ogg_sync_pageout(&oy, &og) > 0)
+        ogg_stream_pagein(&to, &og);
+    while (1) {
+        while (!videobuf_ready) {
+            if (ogg_stream_packetout(&to, &op) > 0) {
+                th_decode_packetin(td, &op, &videobuf_granulepos);
+                videobuf_time = th_granule_time(td, videobuf_granulepos);
+                videobuf_ready = 1;
+                frames++;
+            } else
+                break;
+        }
+        printf("\rframe:%d", frames);
+        if (!videobuf_ready && feof(infile)) break;
+        if (!videobuf_ready) {
+            buffer_data(infile, &oy);
+            while (ogg_sync_pageout(&oy, &og) > 0)
+                ogg_stream_pagein(&to, &og);
+        } else {
+            // video_write()
+        }
+        videobuf_ready = 0;
+    }
+    ogg_stream_clear(&to);
+    th_decode_free(td);
+    th_comment_clear(&tc);
+    th_info_clear(&ti);
+    ogg_sync_clear(&oy);
+    fclose(infile);
+
     return 0;
 }
