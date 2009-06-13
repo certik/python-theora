@@ -34,6 +34,8 @@ cdef extern from "theora/theoradec.h":
         pass
     ctypedef struct th_dec_ctx:
         pass
+    ctypedef struct th_ycbcr_buffer:
+        pass
 
     int ogg_sync_init(ogg_sync_state *oy)
     void th_comment_init(th_comment *_tc)
@@ -57,6 +59,7 @@ cdef extern from "theora/theoradec.h":
     int ogg_sync_clear(ogg_sync_state *oy)
     void th_info_clear(th_info *_info)
     void th_comment_clear(th_comment *_tc)
+    int th_decode_ycbcr_out(th_dec_ctx *_dec, th_ycbcr_buffer _ycbcr)
 
 cdef class Ogg:
     cdef object _infile
@@ -92,6 +95,18 @@ cdef class Ogg:
         ogg_sync_wrote(oy, bytes)
         return bytes
         return len(buffer)
+
+    cdef void video_write(self, th_dec_ctx *td):
+        cdef th_ycbcr_buffer ycbcr
+        th_decode_ycbcr_out(td, ycbcr)
+        #if th_decode_ycbcr_out(td, ycbcr) != 0:
+        #    raise Exception("th_decode_ycbcr_out failed\n")
+        #print "w: %d, h: %d, stride: %d\n" % (ycbcr[0].width, ycbcr[0].height,
+        #        ycbcr[0].stride)
+        #printf("w: %d, h: %d, stride: %d\n", ycbcr[1].width, ycbcr[1].height,
+        #        ycbcr[1].stride);
+        #printf("w: %d, h: %d, stride: %d\n", ycbcr[2].width, ycbcr[2].height,
+        #        ycbcr[2].stride);
 
     def test(self):
         cdef ogg_stream_state test
@@ -170,8 +185,8 @@ cdef class Ogg:
                 self.buffer_data(&self._oy)
                 while ogg_sync_pageout(&self._oy, &self._og) > 0:
                     ogg_stream_pagein(&self._to, &self._og)
-            #else:
-            #    self.video_write(self._td)
+            else:
+                self.video_write(self._td)
             videobuf_ready = False
 
         ogg_stream_clear(&self._to)
