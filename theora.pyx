@@ -126,7 +126,6 @@ cdef class Ogg:
         memcpy(buffer, m, n)
         ogg_sync_wrote(&self._oy, bytes)
         return bytes
-        return len(buffer)
 
     def YCbCr_tuple2array(self, YCbCr):
         """
@@ -219,8 +218,7 @@ cdef class Ogg:
         while stateflag:
             ret = self.buffer_data();
             if ret == 0:
-                print "done"
-                return
+                raise Exception("End of file while searching for headers 1")
             while ogg_sync_pageout(&self._oy, &self._og) > 0:
                 if ogg_page_bos(&self._og) == 0:
                     if theora_p:
@@ -230,22 +228,24 @@ cdef class Ogg:
                 ogg_stream_init(&test, ogg_page_serialno(&self._og))
                 ogg_stream_pagein(&test, &self._og)
                 ogg_stream_packetout(&test, &self._op)
+                # is this the first theora stream?
                 if not theora_p and \
                         th_decode_headerin(&self._ti, &self._tc,
                             &self._setup, &self._op) >= 0:
+                    # yes, read it to self._to
                     memcpy(&self._to, &test, sizeof(test))
                     theora_p = True
                 else:
+                    # no, skip it
                     ogg_stream_clear(&test)
         while theora_p > 0 and (theora_p < 3):
             ret = ogg_stream_packetout(&self._to, &self._op)
             while theora_p > 0 and (theora_p < 3) and ret != 0:
                 if ret < 0:
-                    print "Error parsing headers 1"
-                    return
+                    raise Exception("Error parsing headers 1")
                 if th_decode_headerin(&self._ti, &self._tc,
                         &self._setup, &self._op) < 0:
-                    print "Error parsing headers 2"
+                    raise Exception("Error parsing headers 2")
                 theora_p += 1
                 if theora_p == 3: break
                 ret = ogg_stream_packetout(&self._to, &self._op)
@@ -254,8 +254,7 @@ cdef class Ogg:
             else:
                 ret = self.buffer_data()
                 if ret == 0:
-                    print "End of file while searching for headers"
-                    return
+                    raise Exception("End of file while searching for headers 2")
         if self._ti.fps_denominator == 0:
             raise Exception("fps_denominator is zero")
         print "Ogg logical stream %lx is Theora %dx%d %.02f fps video\n" \
@@ -284,10 +283,12 @@ cdef class Ogg:
                         &videobuf_granulepos)
                 self._time = th_granule_time(self._td, videobuf_granulepos)
                 self._frame += 1
-                return
+                return True
             else:
                 # no, we need to read more data
-                self.buffer_data()
+                if self.buffer_data() == 0:
+                    # EOF reached
+                    return False
                 while ogg_sync_pageout(&self._oy, &self._og) > 0:
                     ogg_stream_pagein(&self._to, &self._og)
 
