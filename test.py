@@ -22,7 +22,7 @@ Cb = Cb2.reshape((1, w, h))
 Cr = Cr2.reshape((1, w, h))
 A = concatenate((Y, Cb, Cr))
 img = toimage(A, mode="YCbCr", channel_axis=0)
-print img
+img.convert("RGB").save("frame.png")
 
 from pylab import imshow, show
 from matplotlib import cm
