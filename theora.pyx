@@ -81,6 +81,61 @@ cdef extern from "theora/theoradec.h":
 cimport numpy as np
 
 cdef class Theora:
+    """
+    Provides a nice high level Python interface to a theora video stream.
+
+    It can read frames as numpy arrays or PIL images.
+
+    Example of usage:
+    -----------------
+
+    In [1]: from theora import Theora
+
+    In [2]: t = Theora("tw.ogv")
+
+    In [3]: t
+    Out[3]: <theora.Theora object at 0x23484c0>
+
+    In [4]: print t
+    ------> print(t)
+    <Ogg logical stream 5ba555da is Theora 320x240 29.97 fps video, encoded frame
+    content is 320x240 with 0x0 offset, aspect is 0:0>
+
+    In [5]: t.read_frame()
+    Out[5]: True
+
+    In [6]: t.read_frame()
+    Out[6]: True
+
+    In [7]: t.get_frame_data()
+    Out[7]:
+    [array([[17, 17, 17, ..., 17, 17, 17],
+           [17, 17, 17, ..., 17, 17, 17],
+           [17, 17, 17, ..., 17, 17, 17],
+           ...,
+           [17, 17, 17, ..., 17, 17, 17],
+           [17, 17, 17, ..., 17, 17, 17],
+           [17, 17, 17, ..., 17, 17, 17]], dtype=uint8),
+     array([[128, 128, 128, ..., 128, 128, 128],
+           [128, 128, 128, ..., 128, 128, 128],
+           [128, 128, 128, ..., 128, 128, 128],
+           ...,
+           [128, 128, 128, ..., 128, 128, 128],
+           [128, 128, 128, ..., 128, 128, 128],
+           [128, 128, 128, ..., 128, 128, 128]], dtype=uint8),
+     array([[128, 128, 128, ..., 128, 128, 128],
+           [128, 128, 128, ..., 128, 128, 128],
+           [128, 128, 128, ..., 128, 128, 128],
+           ...,
+           [128, 128, 128, ..., 128, 128, 128],
+           [128, 128, 128, ..., 128, 128, 128],
+           [128, 128, 128, ..., 128, 128, 128]], dtype=uint8)]
+
+    In [8]: img = t.get_frame_image()
+
+    In [9]: img.save("b.png")
+
+    """
     cdef object _infile
     cdef ogg_sync_state _oy
     cdef th_comment _tc
@@ -94,7 +149,16 @@ cdef class Theora:
     cdef double _time
 
     def __init__(self, f):
-        self._infile = f
+        """
+        Opens the file "f" and read the headers.
+
+        f .... either the filename or an open stream, that supports the .read()
+               method
+        """
+        if isinstance(f, (str, unicode)):
+            self._infile = open(f)
+        else:
+            self._infile = f
         ogg_sync_init(&self._oy)
         th_comment_init(&self._tc)
         th_info_init(&self._ti)
