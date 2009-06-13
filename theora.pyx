@@ -4,6 +4,17 @@ cdef extern from "stdlib.h":
     void free(void *mem)
     void *memcpy(void *dst, void *src, long n)
 
+cdef extern from "arrayobject.h":
+
+    ctypedef int intp
+
+    ctypedef extern class numpy.ndarray [object PyArrayObject]:
+        cdef char *data
+        cdef int nd
+        cdef intp *dimensions
+        cdef intp *strides
+        cdef int flags
+
 cdef extern from "theora/theoradec.h":
 
     ctypedef unsigned int ogg_uint32_t
@@ -103,7 +114,7 @@ cdef class Ogg:
         return bytes
         return len(buffer)
 
-    cdef void video_write(self, th_dec_ctx *td):
+    cdef video_write(self, th_dec_ctx *td):
         cdef th_ycbcr_buffer ycbcr
         if th_decode_ycbcr_out(td, ycbcr) != 0:
             raise Exception("th_decode_ycbcr_out failed\n")
@@ -113,6 +124,12 @@ cdef class Ogg:
                 ycbcr[1].stride)
         print "w: %d, h: %d, stride: %d" % (ycbcr[2].width, ycbcr[2].height,
                 ycbcr[2].stride)
+        from numpy import zeros
+        cdef int n = (ycbcr[0].width+ycbcr[0].stride)*ycbcr[0].height
+        cdef ndarray Y = zeros(n, dtype = "uint8")
+        cdef char *Yp = <char *>Y.data
+        memcpy(Yp, ycbcr[0].data, n)
+        return Y
 
     def test(self):
         cdef ogg_stream_state test
@@ -178,14 +195,14 @@ cdef class Ogg:
             ogg_stream_pagein(&self._to, &self._og)
         videobuf_ready = False
         frames = 0
-        while frames < 100:
+        while frames < 3:
             while not videobuf_ready:
                 if ogg_stream_packetout(&self._to, &self._op) > 0:
                     th_decode_packetin(self._td, &self._op,
                             &videobuf_granulepos)
                     videobuf_time = th_granule_time(self._td,
                             videobuf_granulepos)
-                    print videobuf_time
+                    print "video time:", videobuf_time
                     videobuf_ready = True
                     frames += 1
                 else:
@@ -196,7 +213,7 @@ cdef class Ogg:
                 while ogg_sync_pageout(&self._oy, &self._og) > 0:
                     ogg_stream_pagein(&self._to, &self._og)
             else:
-                self.video_write(self._td)
+                return self.video_write(self._td)
             videobuf_ready = False
 
         ogg_stream_clear(&self._to)
