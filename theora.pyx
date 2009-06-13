@@ -115,16 +115,16 @@ cdef class Ogg:
     def time(self):
         return self._time
 
-    cdef int buffer_data(self, ogg_sync_state *oy, int n=4096):
+    cdef int buffer_data(self, int n=4096):
         """
         Reads "n" bytes from self._infile into the ogg_sync_state "oy".
         """
         s = self._infile.read(n)
         cdef int bytes=len(s)
-        cdef char *buffer=ogg_sync_buffer(oy, n)
+        cdef char *buffer=ogg_sync_buffer(&self._oy, n)
         cdef char *m=s
         memcpy(buffer, m, n)
-        ogg_sync_wrote(oy, bytes)
+        ogg_sync_wrote(&self._oy, bytes)
         return bytes
         return len(buffer)
 
@@ -210,11 +210,14 @@ cdef class Ogg:
         th_decode_free(self._td)
 
     def read_headers(self):
+        """
+        Reads headers of the theora file.
+        """
         cdef ogg_stream_state test
         stateflag = True
         theora_p = False
         while stateflag:
-            ret = self.buffer_data(&self._oy);
+            ret = self.buffer_data();
             if ret == 0:
                 print "done"
                 return
@@ -249,7 +252,7 @@ cdef class Ogg:
             if ogg_sync_pageout(&self._oy, &self._og) > 0:
                 if theora_p > 0: ogg_stream_pagein(&self._to, &self._og)
             else:
-                ret = self.buffer_data(&self._oy)
+                ret = self.buffer_data()
                 if ret == 0:
                     print "End of file while searching for headers"
                     return
@@ -267,11 +270,11 @@ cdef class Ogg:
         self._td = th_decode_alloc(&self._ti, self._setup)
         if self._td == NULL:
             raise Exception("th_decode_alloc failed: the decoding parameters are invalid")
-        stateflag = 0
-        while ogg_sync_pageout(&self._oy, &self._og) > 0:
-            ogg_stream_pagein(&self._to, &self._og)
 
     def read_frame(self):
+        """
+        Reads the next frame and returns.
+        """
         cdef ogg_int64_t videobuf_granulepos = -1
         while 1:
             # do we have enough data to form a packet?
@@ -283,8 +286,8 @@ cdef class Ogg:
                 self._frame += 1
                 return
             else:
-                # no, we need need more data
-                self.buffer_data(&self._oy)
+                # no, we need to read more data
+                self.buffer_data()
                 while ogg_sync_pageout(&self._oy, &self._og) > 0:
                     ogg_stream_pagein(&self._to, &self._og)
 
