@@ -36,6 +36,12 @@ cdef extern from "theora/theoradec.h":
         pass
     ctypedef struct th_ycbcr_buffer:
         pass
+    ctypedef struct th_img_plane:
+        int width
+        int height
+        int stride
+        unsigned char *data
+    ctypedef th_img_plane th_ycbcr_buffer[3]
 
     int ogg_sync_init(ogg_sync_state *oy)
     void th_comment_init(th_comment *_tc)
@@ -98,15 +104,15 @@ cdef class Ogg:
 
     cdef void video_write(self, th_dec_ctx *td):
         cdef th_ycbcr_buffer ycbcr
-        th_decode_ycbcr_out(td, ycbcr)
-        #if th_decode_ycbcr_out(td, ycbcr) != 0:
-        #    raise Exception("th_decode_ycbcr_out failed\n")
-        #print "w: %d, h: %d, stride: %d\n" % (ycbcr[0].width, ycbcr[0].height,
-        #        ycbcr[0].stride)
-        #printf("w: %d, h: %d, stride: %d\n", ycbcr[1].width, ycbcr[1].height,
-        #        ycbcr[1].stride);
-        #printf("w: %d, h: %d, stride: %d\n", ycbcr[2].width, ycbcr[2].height,
-        #        ycbcr[2].stride);
+        #th_decode_ycbcr_out(self._td, ycbcr)
+        if th_decode_ycbcr_out(td, ycbcr) != 0:
+            raise Exception("th_decode_ycbcr_out failed\n")
+        print "w: %d, h: %d, stride: %d" % (ycbcr[0].width, ycbcr[0].height,
+                ycbcr[0].stride)
+        print "w: %d, h: %d, stride: %d" % (ycbcr[1].width, ycbcr[1].height,
+                ycbcr[1].stride)
+        print "w: %d, h: %d, stride: %d" % (ycbcr[2].width, ycbcr[2].height,
+                ycbcr[2].stride)
 
     def test(self):
         cdef ogg_stream_state test
@@ -164,6 +170,8 @@ cdef class Ogg:
             self._ti.aspect_numerator, self._ti.aspect_denominator)
 
         self._td = th_decode_alloc(&self._ti, self._setup)
+        if self._td == NULL:
+            raise Exception("th_decode_alloc failed")
         stateflag = 0
         while ogg_sync_pageout(&self._oy, &self._og) > 0:
             ogg_stream_pagein(&self._to, &self._og)
@@ -176,6 +184,7 @@ cdef class Ogg:
                             &videobuf_granulepos)
                     videobuf_time = th_granule_time(self._td,
                             videobuf_granulepos)
+                    print videobuf_time
                     videobuf_ready = True
                     frames += 1
                 else:
