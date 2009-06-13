@@ -83,6 +83,7 @@ cdef class Ogg:
         ogg_sync_init(&self._oy)
         th_comment_init(&self._tc)
         th_info_init(&self._ti)
+        self._setup = NULL
 
     def __del__(self):
         th_comment_clear(&self._tc)
@@ -104,7 +105,6 @@ cdef class Ogg:
 
     cdef void video_write(self, th_dec_ctx *td):
         cdef th_ycbcr_buffer ycbcr
-        #th_decode_ycbcr_out(self._td, ycbcr)
         if th_decode_ycbcr_out(td, ycbcr) != 0:
             raise Exception("th_decode_ycbcr_out failed\n")
         print "w: %d, h: %d, stride: %d" % (ycbcr[0].width, ycbcr[0].height,
@@ -151,6 +151,7 @@ cdef class Ogg:
                     print "Error parsing headers 2"
                 theora_p += 1
                 if theora_p == 3: break
+                ret = ogg_stream_packetout(&self._to, &self._op)
             if ogg_sync_pageout(&self._oy, &self._og) > 0:
                 if theora_p > 0: ogg_stream_pagein(&self._to, &self._og)
             else:
@@ -171,7 +172,7 @@ cdef class Ogg:
 
         self._td = th_decode_alloc(&self._ti, self._setup)
         if self._td == NULL:
-            raise Exception("th_decode_alloc failed")
+            raise Exception("th_decode_alloc failed: the decoding parameters are invalid")
         stateflag = 0
         while ogg_sync_pageout(&self._oy, &self._og) > 0:
             ogg_stream_pagein(&self._to, &self._og)
