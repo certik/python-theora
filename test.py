@@ -13,45 +13,7 @@ A = o.YCbCr_tuple2array(o.test())
 # this fixes the colors, I don't know why:
 #A += 2
 
-def YCbCr2RGB(A):
-    # parameters both Rec. 470M and Rec. 470BG:
-    offset = array([16, 128, 128])
-    excursion = array([219, 224, 224])
-    Kr = 0.299
-    Kb = 0.114
-    M = array([
-        [1, 0, 2*(1-Kr)],
-        [1, -2*(1-Kb)*Kb/(1-Kb-Kr), -2*(1-Kr)*Kr/(1-Kb-Kr)],
-        [1, 2*(1-Kb), 0]
-        ])
-    M_inv = inv(M)
-
-    def YCbCr2YPbPr(YCbCr):
-        YCbCr = array(YCbCr)
-        return (YCbCr - offset)*1.0/excursion
-
-    def YPbPr2YCbCr(YPbPr):
-        YPbPr = array(YPbPr)
-        return array(round(YPbPr*excursion + offset), dtype="uint8")
-
-    def YPbPr2RGB(YPbPr):
-        YPbPr = array(YPbPr)
-        return dot(M, YPbPr)
-
-    def RGB2YPbPr(RGB):
-        RGB = array(RGB)
-        return dot(M_inv, RGB)
-
-    n, w, h = A.shape
-    B = array(A.copy(), dtype="double")
-    for i in range(w):
-        for j in range(h):
-            YCbCr = A[:, i, j]
-            B[:, i, j] = YPbPr2RGB(YCbCr2YPbPr(YCbCr))
-            #print "from:", YCbCr, "to:", B[:, i, j]
-    return B
-
-A = YCbCr2RGB(A)
+A = o.YCbCr2RGB(A)
 print A[:, 100, 100]
 #img = toimage(A, mode="YCbCr", channel_axis=0)
 #img = toimage(A, channel_axis=0)

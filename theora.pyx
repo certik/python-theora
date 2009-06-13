@@ -138,6 +138,32 @@ cdef class Ogg:
         A = concatenate((Y, Cb, Cr))
         return A
 
+    def YCbCr2RGB(self, A):
+        """
+        Converts the the (3, w, h) array from YCbCr into RGB.
+        """
+        from numpy import array, dot
+        # parameters both Rec. 470M and Rec. 470BG:
+        offset = array([16, 128, 128])
+        excursion = array([219, 224, 224])
+        Kr = 0.299
+        Kb = 0.114
+        M = array([
+            [1, 0, 2*(1-Kr)],
+            [1, -2*(1-Kb)*Kb/(1-Kb-Kr), -2*(1-Kr)*Kr/(1-Kb-Kr)],
+            [1, 2*(1-Kb), 0]
+            ])
+
+        n, w, h = A.shape
+        B = array(A.copy(), dtype="double")
+        for i in range(w):
+            for j in range(h):
+                YCbCr = A[:, i, j]
+                YPbPr = (YCbCr - offset)*1.0/excursion
+                RGB = dot(M, YPbPr)
+                B[:, i, j] = RGB
+        return B
+
     cdef video_write(self, th_dec_ctx *td):
         from numpy import zeros
         cdef th_ycbcr_buffer ycbcr
@@ -245,3 +271,33 @@ cdef class Ogg:
         ogg_stream_clear(&self._to)
         th_decode_free(self._td)
         print "ok"
+
+cdef void YCbCr2RGB_fast_c(char Y, char Cb, char Cr, char *R, char *G, char* B):
+    """
+    Converts from YCbCr to RGB using a very fast C integer arithmetics.
+
+    Assumes both YCbCr and RGB are between 0..255
+
+    This is a C version of the function. If you are in Python, use
+    YCbCr2RGB_fast.
+    """
+    cdef char C, D, E
+    C = Y - 16
+    D = Cb - 128
+    E = Cr - 128
+
+    R[0] = (298*C + 409*E + 128) >> 8
+    G[0] = (298*C - 100*D - 208*E + 128) >> 8
+    B[0] = (298*C + 516*D + 128) >> 8
+
+def YCbCr2RGB_fast(YCbCr):
+    """
+    Converts from YCbCr to RGB using a very fast C integer arithmetics.
+
+    Assumes both YCbCr and RGB are between 0..255
+    """
+    from numpy import array
+    cdef char R, G, B
+    Y, Cb, Cr = YCbCr
+    YCbCr2RGB_fast_c(Y, Cb, Cr, &R, &G, &B)
+    return array([R, G, B], dtype="uint8")

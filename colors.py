@@ -48,3 +48,6 @@ def RGB_float2RGB(RGB_float):
 def RGB2RGB_float(RGB):
     RGB = array(RGB)
     return RGB/255.
+
+def YCbCr2RGB(YCrCb):
+    return RGB_float2RGB(YPbPr2RGB_float(YCbCr2YPbPr(YCrCb)))
