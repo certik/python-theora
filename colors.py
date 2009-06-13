@@ -49,10 +49,13 @@ def clip2(a):
     return a
 
 def clip(a):
-    a[0] = clip2(a[0])
-    a[1] = clip2(a[1])
-    a[2] = clip2(a[2])
-    return a
+    #print a
+    b = a.copy()
+    b[0] = clip2(a[0])
+    b[1] = clip2(a[1])
+    b[2] = clip2(a[2])
+    #print b
+    return b
 
 def RGB_float2RGB(RGB_float):
     RGB_float = array(RGB_float)
@@ -62,5 +65,27 @@ def RGB2RGB_float(RGB):
     RGB = array(RGB)
     return RGB/255.
 
-def YCbCr2RGB(YCrCb):
+def YCbCr2RGB_precise(YCrCb):
+    """
+    This is a precise, but slow version.
+    """
     return RGB_float2RGB(YPbPr2RGB_float(YCbCr2YPbPr(YCrCb)))
+
+def YCbCr2RGB(YCbCr):
+    """
+    This is a fast version, that sometimes differes by 1.
+
+    It can be easily cythonized.
+    """
+    Y, Cb, Cr = YCbCr
+    C = Y - 16
+    D = Cb - 128
+    E = Cr - 128
+    print C, D, E
+    print (298*C + 409*E + 128)
+    print (298*C + 409*E + 128) >> 8
+
+    R = clip2((298*C + 409*E + 128) >> 8)
+    G = clip2((298*C - 100*D - 208*E + 128) >> 8)
+    B = clip2((298*C + 516*D + 128) >> 8)
+    return array([R, G, B])

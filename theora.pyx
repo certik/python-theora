@@ -271,7 +271,6 @@ cdef class Ogg:
         print "ok"
 
 cdef inline unsigned char clip(int a):
-    return a
     if a > 255:
         return 255
     elif a < 0:
@@ -289,16 +288,19 @@ cdef void YCbCr2RGB_fast_c(unsigned char Y, unsigned char Cb, unsigned char
     This is a C version of the function. If you are in Python, use
     YCbCr2RGB_fast.
     """
-    from colors import YCbCr2RGB
-    RGB = YCbCr2RGB((Y, Cb, Cr))
-    R[0] = RGB[0]
-    G[0] = RGB[1]
-    B[0] = RGB[2]
-    return
-    cdef char C, D, E
+    #from colors import YCbCr2RGB
+    #RGB = YCbCr2RGB((Y, Cb, Cr))
+    #R[0] = RGB[0]
+    #G[0] = RGB[1]
+    #B[0] = RGB[2]
+    #return
+    cdef int C, D, E
     C = Y - 16
     D = Cb - 128
     E = Cr - 128
+    #print Y, Y-16, C, D, E
+    #print (298*C + 409*E + 128)
+    #print (298*C + 409*E + 128) >> 8
 
     R[0] = clip((298*C + 409*E + 128) >> 8)
     G[0] = clip((298*C - 100*D - 208*E + 128) >> 8)
