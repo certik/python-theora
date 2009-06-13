@@ -125,7 +125,7 @@ cdef class Ogg:
         print "w: %d, h: %d, stride: %d" % (ycbcr[2].width, ycbcr[2].height,
                 ycbcr[2].stride)
         from numpy import zeros
-        cdef int n = (ycbcr[0].width+ycbcr[0].stride)*ycbcr[0].height
+        cdef int n = ycbcr[0].stride*ycbcr[0].height
         cdef ndarray Y = zeros(n, dtype = "uint8")
         cdef char *Yp = <char *>Y.data
         memcpy(Yp, ycbcr[0].data, n)

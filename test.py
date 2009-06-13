@@ -1,7 +1,6 @@
 #! /usr/bin/env python
 
 from theora import Ogg
-from numpy import zeros
 
 f = open("video.ogv")
 o = Ogg(f)
@@ -10,11 +9,9 @@ w = 672
 h = 464
 stride = 704
 
-B = zeros((w, h))
-for j in range(h):
-    for i in range(w):
-        B[i, j] = A[j*stride+i]
+B = A.reshape((h, stride))
 
 from pylab import imshow, show
-imshow(B)
+from matplotlib import cm
+imshow(B, cmap=cm.gray)
 show()
