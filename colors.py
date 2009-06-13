@@ -41,9 +41,22 @@ def RGB_float2YPbPr(RGB_float):
     RGB_float = array(RGB_float)
     return dot(M_inv, RGB_float)
 
+def clip2(a):
+    if a > 255:
+        return 255
+    elif a < 0:
+        return 0
+    return a
+
+def clip(a):
+    a[0] = clip2(a[0])
+    a[1] = clip2(a[1])
+    a[2] = clip2(a[2])
+    return a
+
 def RGB_float2RGB(RGB_float):
     RGB_float = array(RGB_float)
-    return array(round(RGB_float*255), dtype="uint8")
+    return array(clip(round(RGB_float*255)), dtype="uint8")
 
 def RGB2RGB_float(RGB):
     RGB = array(RGB)

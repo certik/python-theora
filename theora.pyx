@@ -289,6 +289,12 @@ cdef void YCbCr2RGB_fast_c(unsigned char Y, unsigned char Cb, unsigned char
     This is a C version of the function. If you are in Python, use
     YCbCr2RGB_fast.
     """
+    from colors import YCbCr2RGB
+    RGB = YCbCr2RGB((Y, Cb, Cr))
+    R[0] = RGB[0]
+    G[0] = RGB[1]
+    B[0] = RGB[2]
+    return
     cdef char C, D, E
     C = Y - 16
     D = Cb - 128
