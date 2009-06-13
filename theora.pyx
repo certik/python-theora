@@ -18,6 +18,8 @@ cdef extern from "theora/theoradec.h":
         pass
     ctypedef struct ogg_packet:
         pass
+    ctypedef struct th_setup_info:
+        pass
 
     int ogg_sync_init(ogg_sync_state *oy)
     void th_comment_init(th_comment *_tc)
@@ -30,6 +32,9 @@ cdef extern from "theora/theoradec.h":
     int ogg_page_serialno(ogg_page *og)
     int ogg_stream_init(ogg_stream_state *os, int serialno)
     int ogg_stream_packetout(ogg_stream_state *os, ogg_packet *op)
+    int th_decode_headerin(th_info *_info,th_comment *_tc,
+             th_setup_info **_setup,ogg_packet *_op)
+    int ogg_stream_clear(ogg_stream_state *os)
 
 cdef class Ogg:
     cdef object _infile
@@ -39,6 +44,7 @@ cdef class Ogg:
     cdef ogg_page _og
     cdef ogg_stream_state _to
     cdef ogg_packet _op
+    cdef th_setup_info *_setup
 
     def __init__(self, f):
         self._infile = f
@@ -77,10 +83,11 @@ cdef class Ogg:
                 ogg_stream_init(&test, ogg_page_serialno(&self._og))
                 ogg_stream_pagein(&test, &self._og)
                 ogg_stream_packetout(&test, &self._op)
-                #if (!theora_p && th_decode_headerin(&ti, &tc, &setup, &op) >= 0) {
-                #    memcpy(&to, &test, sizeof(test));
-                #    theora_p = 1;
-                #} else {
-                #    ogg_stream_clear(&test);
-                #}
+                if not theora_p and \
+                        th_decode_headerin(&self._ti, &self._tc,
+                            &self._setup, &self._op) >= 0:
+                    memcpy(&self._to, &test, sizeof(test))
+                    theora_p = True
+                else:
+                    ogg_stream_clear(&test)
         print "ok"
