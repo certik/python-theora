@@ -31,6 +31,8 @@ cdef extern from "theora/theoradec.h":
         pass
     ctypedef struct th_setup_info:
         pass
+    ctypedef struct th_dec_ctx:
+        pass
 
     int ogg_sync_init(ogg_sync_state *oy)
     void th_comment_init(th_comment *_tc)
@@ -46,6 +48,7 @@ cdef extern from "theora/theoradec.h":
     int th_decode_headerin(th_info *_info,th_comment *_tc,
              th_setup_info **_setup,ogg_packet *_op)
     int ogg_stream_clear(ogg_stream_state *os)
+    th_dec_ctx *th_decode_alloc(th_info *_info, th_setup_info *_setup)
 
 cdef class Ogg:
     cdef object _infile
@@ -56,6 +59,7 @@ cdef class Ogg:
     cdef ogg_stream_state _to
     cdef ogg_packet _op
     cdef th_setup_info *_setup
+    cdef th_dec_ctx *_td
 
     def __init__(self, f):
         self._infile = f
@@ -129,4 +133,9 @@ cdef class Ogg:
             self._ti.frame_width, self._ti.frame_height,
             self._ti.pic_x, self._ti.pic_y,
             self._ti.aspect_numerator, self._ti.aspect_denominator)
+
+        self._td = th_decode_alloc(&self._ti, self._setup)
+        stateflag = 0
+        while ogg_sync_pageout(&self._oy, &self._og) > 0:
+            ogg_stream_pagein(&self._to, &self._og)
         print "ok"
