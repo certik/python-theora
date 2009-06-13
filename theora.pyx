@@ -90,4 +90,22 @@ cdef class Ogg:
                     theora_p = True
                 else:
                     ogg_stream_clear(&test)
+        while theora_p > 0 and (theora_p < 3):
+            ret = ogg_stream_packetout(&self._to, &self._op)
+            while theora_p > 0 and (theora_p < 3) and ret != 0:
+                if ret < 0:
+                    print "Error parsing headers 1"
+                    return
+                if th_decode_headerin(&self._ti, &self._tc,
+                        &self._setup, &self._op) < 0:
+                    print "Error parsing headers 2"
+                theora_p += 1
+                if theora_p == 3: break
+            if ogg_sync_pageout(&self._oy, &self._og) > 0:
+                if theora_p > 0: ogg_stream_pagein(&self._to, &self._og)
+            else:
+                ret = self.buffer_data(&self._oy)
+                if ret == 0:
+                    print "End of file while searching for headers"
+                    return
         print "ok"
