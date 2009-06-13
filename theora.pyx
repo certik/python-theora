@@ -131,6 +131,15 @@ cdef class Theora:
         ogg_sync_wrote(&self._oy, bytes)
         return bytes
 
+    cdef fix_size(self, A, w, h):
+        from numpy import zeros
+        B = zeros((w, h), dtype="uint8")
+        for i in range(w):
+            for j in range(h):
+                B[i, j] = A[i/2, j/2]
+        return B
+
+
     def YCbCr_tuple2array(self, YCbCr):
         """
         Converts the YCbCr tuple to one numpy (w, h, 3) array.
@@ -138,20 +147,14 @@ cdef class Theora:
         It also automatically rescales Cb and Cr if necessary (Theora encoder
         sometimes reduces their width/height twice compared to Y).
         """
-        from numpy import concatenate, zeros_like
+        from numpy import concatenate
         Y, Cb, Cr = YCbCr
-        Cb2 = zeros_like(Y)
-        for i in range(Cb2.shape[0]):
-            for j in range(Cb2.shape[1]):
-                Cb2[i, j] = Cb[i/2, j/2]
-        Cr2 = zeros_like(Y)
-        for i in range(Cr2.shape[0]):
-            for j in range(Cr2.shape[1]):
-                Cr2[i, j] = Cr[i/2, j/2]
         w, h = Y.shape
+        Cb = self.fix_size(Cb, w, h)
+        Cr = self.fix_size(Cr, w, h)
         Y = Y.reshape((w, h, 1))
-        Cb = Cb2.reshape((w, h, 1))
-        Cr = Cr2.reshape((w, h, 1))
+        Cb = Cb.reshape((w, h, 1))
+        Cr = Cr.reshape((w, h, 1))
         A = concatenate((Y, Cb, Cr), axis=2)
         return A
 

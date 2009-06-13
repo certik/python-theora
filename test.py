@@ -8,6 +8,7 @@ from pylab import imshow, show
 f = open("video.ogv")
 o = Theora(f)
 while o.read_frame():
+    break
     print o.frame, o.time
 print "frame:", o.frame
 print "time:", o.time
