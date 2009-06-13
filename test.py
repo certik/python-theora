@@ -11,15 +11,12 @@ f = open("video.ogv")
 o = Ogg(f)
 A = o.YCbCr_tuple2array(o.test())
 
-print "converting to RGB"
-A = o.YCbCr2RGB(A)
-#print A[:, 100, 100]
-#img = toimage(A, mode="YCbCr", channel_axis=0)
-img = toimage(A, channel_axis=2)
-img.convert("RGB").save("frame.png")
+#img = toimage(A, mode="YCbCr", channel_axis=2)
+#img.convert("RGB").save("frame.png")
+img = toimage(o.YCbCr2RGB(A), channel_axis=2)
+img.save("frame.png")
 
 from pylab import imshow, show
 from matplotlib import cm
-#imshow(B)#, cmap=cm.gray, origin="lower")
 imshow(img, origin="lower")
 show()

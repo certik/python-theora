@@ -142,7 +142,7 @@ cdef class Ogg:
 
     def YCbCr2RGB(self, np.ndarray[np.uint8_t, ndim=3] A):
         """
-        Converts the the (3, w, h) array from YCbCr into RGB.
+        Converts the the (w, h, 3) array from YCbCr into RGB.
         """
         cdef int w, h, i, j
         cdef int Y, Cb, Cr
