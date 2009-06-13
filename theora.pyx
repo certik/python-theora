@@ -114,6 +114,30 @@ cdef class Ogg:
         return bytes
         return len(buffer)
 
+    def YCbCr_tuple2array(self, YCbCr):
+        """
+        Converts the YCbCr tuple to one numpy array.
+
+        It also automatically rescales Cb and Cr if necessary (Theora encoder
+        sometimes reduces their width/height twice compared to Y).
+        """
+        from numpy import concatenate, zeros_like
+        Y, Cb, Cr = YCbCr
+        Cb2 = zeros_like(Y)
+        for i in range(Cb2.shape[0]):
+            for j in range(Cb2.shape[1]):
+                Cb2[i, j] = Cb[i/2, j/2]
+        Cr2 = zeros_like(Y)
+        for i in range(Cr2.shape[0]):
+            for j in range(Cr2.shape[1]):
+                Cr2[i, j] = Cr[i/2, j/2]
+        w, h = Y.shape
+        Y = Y.reshape((1, w, h))
+        Cb = Cb2.reshape((1, w, h))
+        Cr = Cr2.reshape((1, w, h))
+        A = concatenate((Y, Cb, Cr))
+        return A
+
     cdef video_write(self, th_dec_ctx *td):
         from numpy import zeros
         cdef th_ycbcr_buffer ycbcr
