@@ -8,11 +8,13 @@ cdef extern from "theora/theoradec.h":
 
     ctypedef struct ogg_sync_state:
         pass
-
     ctypedef struct th_comment:
         pass
-
     ctypedef struct th_info:
+        pass
+    ctypedef struct ogg_stream_state:
+        pass
+    ctypedef struct ogg_page:
         pass
 
     int ogg_sync_init(ogg_sync_state *oy)
@@ -20,12 +22,17 @@ cdef extern from "theora/theoradec.h":
     void th_info_init(th_info *_info)
     char *ogg_sync_buffer(ogg_sync_state *oy, long size)
     int ogg_sync_wrote(ogg_sync_state *oy, long bytes)
+    int ogg_sync_pageout(ogg_sync_state *oy, ogg_page *og)
+    int ogg_page_bos(ogg_page *og)
+    int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og)
 
 cdef class Ogg:
     cdef object _infile
     cdef ogg_sync_state _oy
     cdef th_comment _tc
     cdef th_info _ti
+    cdef ogg_page _og
+    cdef ogg_stream_state _to
 
     def __init__(self, f):
         self._infile = f
@@ -34,6 +41,9 @@ cdef class Ogg:
         th_info_init(&self._ti)
 
     cdef int buffer_data(self, ogg_sync_state *oy, int n=4096):
+        """
+        Reads "n" bytes from self._infile into the ogg_sync_state "oy".
+        """
         s = self._infile.read(n)
         cdef int bytes=len(s)
         cdef char *buffer=ogg_sync_buffer(oy, n)
@@ -44,5 +54,27 @@ cdef class Ogg:
         return len(buffer)
 
     def test(self):
-        self.buffer_data(&self._oy);
+        cdef ogg_stream_state test
+        stateflag = True
+        theora_p = False
+        while stateflag:
+            ret = self.buffer_data(&self._oy);
+            if ret == 0:
+                print "done"
+                return
+            while ogg_sync_pageout(&self._oy, &self._og) > 0:
+                if ogg_page_bos(&self._og) != 0:
+                    if theora_p:
+                        ogg_stream_pagein(&self._to, &self._og)
+                    stateflag = False
+                    break
+                #ogg_stream_init(&test, ogg_page_serialno(&og));
+                #ogg_stream_pagein(&test, &og);
+                #ogg_stream_packetout(&test, &op);
+                #if (!theora_p && th_decode_headerin(&ti, &tc, &setup, &op) >= 0) {
+                #    memcpy(&to, &test, sizeof(test));
+                #    theora_p = 1;
+                #} else {
+                #    ogg_stream_clear(&test);
+                #}
         print "ok"
