@@ -131,12 +131,18 @@ cdef class Theora:
         ogg_sync_wrote(&self._oy, bytes)
         return bytes
 
-    cdef fix_size(self, A, w, h):
+    def fix_size(self, np.ndarray[np.uint8_t, ndim=2] A, int w, int h):
+        """
+        Enlarges the matrix A to fit into the (w, h) shape.
+
+        Currently it can only double each dimension.
+        """
+        cdef int i, j
         from numpy import zeros
-        B = zeros((w, h), dtype="uint8")
+        cdef np.ndarray[np.uint8_t, ndim=2] B = zeros((w, h), dtype="uint8")
         for i in range(w):
             for j in range(h):
-                B[i, j] = A[i/2, j/2]
+                B[i, j] = A[i//2, j//2]
         return B
 
 
