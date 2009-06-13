@@ -376,6 +376,26 @@ cdef class Theora:
                 while ogg_sync_pageout(&self._oy, &self._og) > 0:
                     ogg_stream_pagein(&self._to, &self._og)
 
+    def seek(self, time=None, frame=None):
+        """
+        Seeks to the specified time or frame.
+
+        Currently it can only seek forward.
+
+        Example:
+        >>> a = Theora("tw.ogv")
+        >>> a.seek(1)  # seeks to 1s
+        >>> a.seek(frame = 520) # seeks to the frame 520
+        """
+        if time is not None:
+            while self.read_frame() and self.time < time:
+                pass
+        elif frame is not None:
+            while self.read_frame() and self.frame < time:
+                pass
+        else:
+            raise ValueError("You must specify either the time or frame kwargs")
+
 cdef inline unsigned char clip(int a):
     if a > 255:
         return 255
