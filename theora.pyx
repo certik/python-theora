@@ -115,23 +115,23 @@ cdef class Ogg:
         return len(buffer)
 
     cdef video_write(self, th_dec_ctx *td):
+        from numpy import zeros
         cdef th_ycbcr_buffer ycbcr
         if th_decode_ycbcr_out(td, ycbcr) != 0:
             raise Exception("th_decode_ycbcr_out failed\n")
-        print "w: %d, h: %d, stride: %d" % (ycbcr[0].width, ycbcr[0].height,
-                ycbcr[0].stride)
-        print "w: %d, h: %d, stride: %d" % (ycbcr[1].width, ycbcr[1].height,
-                ycbcr[1].stride)
-        print "w: %d, h: %d, stride: %d" % (ycbcr[2].width, ycbcr[2].height,
-                ycbcr[2].stride)
-        from numpy import zeros
-        cdef int n = ycbcr[0].stride*ycbcr[0].height
-        cdef ndarray Y = zeros(n, dtype = "uint8")
-        cdef char *Yp = <char *>Y.data
-        memcpy(Yp, ycbcr[0].data, n)
-        Y = Y.reshape((ycbcr[0].height, ycbcr[0].stride))
-        Y = Y[:, :ycbcr[0].width]
-        return Y
+        cdef int n
+        cdef ndarray Y
+        cdef char *Yp
+        r = []
+        for i in range(3):
+            n = ycbcr[i].stride*ycbcr[i].height
+            Y = zeros(n, dtype = "uint8")
+            Yp = <char *>Y.data
+            memcpy(Yp, ycbcr[i].data, n)
+            Y = Y.reshape((ycbcr[i].height, ycbcr[i].stride))
+            Y = Y[:, :ycbcr[i].width]
+            r.append(Y)
+        return r
 
     def test(self):
         cdef ogg_stream_state test
