@@ -160,7 +160,7 @@ cdef class Ogg:
                 A_out[0, i, j] = <int>R
                 A_out[1, i, j] = <int>G
                 A_out[2, i, j] = <int>B
-        return A_out/255.
+        return A_out
 
     cdef video_write(self, th_dec_ctx *td):
         from numpy import zeros
@@ -288,19 +288,10 @@ cdef void YCbCr2RGB_fast_c(unsigned char Y, unsigned char Cb, unsigned char
     This is a C version of the function. If you are in Python, use
     YCbCr2RGB_fast.
     """
-    #from colors import YCbCr2RGB
-    #RGB = YCbCr2RGB((Y, Cb, Cr))
-    #R[0] = RGB[0]
-    #G[0] = RGB[1]
-    #B[0] = RGB[2]
-    #return
     cdef int C, D, E
     C = Y - 16
     D = Cb - 128
     E = Cr - 128
-    #print Y, Y-16, C, D, E
-    #print (298*C + 409*E + 128)
-    #print (298*C + 409*E + 128) >> 8
 
     R[0] = clip((298*C + 409*E + 128) >> 8)
     G[0] = clip((298*C - 100*D - 208*E + 128) >> 8)
