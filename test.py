@@ -1,13 +1,12 @@
 #! /usr/bin/env python
 
-from theora import Ogg
+from theora import Theora
 from pylab import imshow, show
 #import IPython
 #IPython.Shell.IPShell(user_ns=dict(globals(), **locals())).mainloop()
 
 f = open("video.ogv")
-o = Ogg(f)
-o.read_headers()
+o = Theora(f)
 while o.read_frame():
     print o.frame, o.time
 print "frame:", o.frame

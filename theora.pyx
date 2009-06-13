@@ -80,7 +80,7 @@ cdef extern from "theora/theoradec.h":
 
 cimport numpy as np
 
-cdef class Ogg:
+cdef class Theora:
     cdef object _infile
     cdef ogg_sync_state _oy
     cdef th_comment _tc
@@ -101,11 +101,15 @@ cdef class Ogg:
         self._setup = NULL
         self._frame = 0
         self._time = 0.
+        self.read_headers()
 
     def __del__(self):
         th_comment_clear(&self._tc)
         th_info_clear(&self._ti)
         ogg_sync_clear(&self._oy)
+        ogg_stream_clear(&self._to)
+        th_decode_free(self._td)
+
 
     @property
     def frame(self):
@@ -201,12 +205,6 @@ cdef class Ogg:
         from scipy.misc import toimage
         A = self.YCbCr_tuple2array(self.get_frame_data())
         return toimage(self.YCbCr2RGB(A), channel_axis=2)
-
-    def test(self):
-        self.read_headers()
-        self.read_frame()
-        ogg_stream_clear(&self._to)
-        th_decode_free(self._td)
 
     def read_headers(self):
         """
