@@ -78,6 +78,8 @@ cdef extern from "theora/theoradec.h":
     void th_comment_clear(th_comment *_tc)
     int th_decode_ycbcr_out(th_dec_ctx *_dec, th_ycbcr_buffer _ycbcr)
 
+cimport numpy as np
+
 cdef class Ogg:
     cdef object _infile
     cdef ogg_sync_state _oy
@@ -138,31 +140,27 @@ cdef class Ogg:
         A = concatenate((Y, Cb, Cr))
         return A
 
-    def YCbCr2RGB(self, A):
+    def YCbCr2RGB(self, np.ndarray[np.uint8_t, ndim=3] A):
         """
         Converts the the (3, w, h) array from YCbCr into RGB.
         """
-        from numpy import array, dot
-        # parameters both Rec. 470M and Rec. 470BG:
-        offset = array([16, 128, 128])
-        excursion = array([219, 224, 224])
-        Kr = 0.299
-        Kb = 0.114
-        M = array([
-            [1, 0, 2*(1-Kr)],
-            [1, -2*(1-Kb)*Kb/(1-Kb-Kr), -2*(1-Kr)*Kr/(1-Kb-Kr)],
-            [1, 2*(1-Kb), 0]
-            ])
-
-        n, w, h = A.shape
-        B = array(A.copy(), dtype="double")
+        cdef int n, w, h, i, j
+        cdef int Y, Cb, Cr
+        cdef unsigned char R, G, B
+        n = A.shape[0]
+        w = A.shape[1]
+        h = A.shape[2]
+        cdef np.ndarray[np.uint8_t, ndim=3] A_out = A.copy()
         for i in range(w):
             for j in range(h):
-                YCbCr = A[:, i, j]
-                YPbPr = (YCbCr - offset)*1.0/excursion
-                RGB = dot(M, YPbPr)
-                B[:, i, j] = RGB
-        return B
+                Y = A[0, i, j]
+                Cb = A[1, i, j]
+                Cr = A[2, i, j]
+                YCbCr2RGB_fast_c(Y, Cb, Cr, &R, &G, &B)
+                A_out[0, i, j] = <int>R
+                A_out[1, i, j] = <int>G
+                A_out[2, i, j] = <int>B
+        return A_out/255.
 
     cdef video_write(self, th_dec_ctx *td):
         from numpy import zeros
@@ -272,7 +270,17 @@ cdef class Ogg:
         th_decode_free(self._td)
         print "ok"
 
-cdef void YCbCr2RGB_fast_c(char Y, char Cb, char Cr, char *R, char *G, char* B):
+cdef inline unsigned char clip(int a):
+    return a
+    if a > 255:
+        return 255
+    elif a < 0:
+        return 0
+    else:
+        return a
+
+cdef void YCbCr2RGB_fast_c(unsigned char Y, unsigned char Cb, unsigned char
+        Cr, unsigned char *R, unsigned char *G, unsigned char* B):
     """
     Converts from YCbCr to RGB using a very fast C integer arithmetics.
 
@@ -286,9 +294,9 @@ cdef void YCbCr2RGB_fast_c(char Y, char Cb, char Cr, char *R, char *G, char* B):
     D = Cb - 128
     E = Cr - 128
 
-    R[0] = (298*C + 409*E + 128) >> 8
-    G[0] = (298*C - 100*D - 208*E + 128) >> 8
-    B[0] = (298*C + 516*D + 128) >> 8
+    R[0] = clip((298*C + 409*E + 128) >> 8)
+    G[0] = clip((298*C - 100*D - 208*E + 128) >> 8)
+    B[0] = clip((298*C + 516*D + 128) >> 8)
 
 def YCbCr2RGB_fast(YCbCr):
     """
@@ -297,7 +305,7 @@ def YCbCr2RGB_fast(YCbCr):
     Assumes both YCbCr and RGB are between 0..255
     """
     from numpy import array
-    cdef char R, G, B
+    cdef unsigned char R, G, B
     Y, Cb, Cr = YCbCr
     YCbCr2RGB_fast_c(Y, Cb, Cr, &R, &G, &B)
     return array([R, G, B], dtype="uint8")
