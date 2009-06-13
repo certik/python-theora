@@ -140,9 +140,20 @@ cdef class Theora:
         cdef int i, j
         from numpy import zeros
         cdef np.ndarray[np.uint8_t, ndim=2] B = zeros((w, h), dtype="uint8")
-        for i in range(w):
-            for j in range(h):
-                B[i, j] = A[i//2, j//2]
+        if A.shape[0] * 2 == w and A.shape[1] * 2 == h:
+            for i in range(w):
+                for j in range(h):
+                    B[i, j] = A[i//2, j//2]
+        elif A.shape[0] * 2 == w and A.shape[1] == h:
+            for i in range(w):
+                for j in range(h):
+                    B[i, j] = A[i//2, j]
+        elif A.shape[0] == w and A.shape[1] == h:
+            for i in range(w):
+                for j in range(h):
+                    B[i, j] = A[i, j]
+        else:
+            raise Exception("Can't enlarge the matrix.")
         return B
 
 
