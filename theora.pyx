@@ -118,7 +118,7 @@ cdef class Ogg:
 
     def YCbCr_tuple2array(self, YCbCr):
         """
-        Converts the YCbCr tuple to one numpy array.
+        Converts the YCbCr tuple to one numpy (w, h, 3) array.
 
         It also automatically rescales Cb and Cr if necessary (Theora encoder
         sometimes reduces their width/height twice compared to Y).
@@ -134,32 +134,31 @@ cdef class Ogg:
             for j in range(Cr2.shape[1]):
                 Cr2[i, j] = Cr[i/2, j/2]
         w, h = Y.shape
-        Y = Y.reshape((1, w, h))
-        Cb = Cb2.reshape((1, w, h))
-        Cr = Cr2.reshape((1, w, h))
-        A = concatenate((Y, Cb, Cr))
+        Y = Y.reshape((w, h, 1))
+        Cb = Cb2.reshape((w, h, 1))
+        Cr = Cr2.reshape((w, h, 1))
+        A = concatenate((Y, Cb, Cr), axis=2)
         return A
 
     def YCbCr2RGB(self, np.ndarray[np.uint8_t, ndim=3] A):
         """
         Converts the the (3, w, h) array from YCbCr into RGB.
         """
-        cdef int n, w, h, i, j
+        cdef int w, h, i, j
         cdef int Y, Cb, Cr
         cdef unsigned char R, G, B
-        n = A.shape[0]
-        w = A.shape[1]
-        h = A.shape[2]
+        w = A.shape[0]
+        h = A.shape[1]
         cdef np.ndarray[np.uint8_t, ndim=3] A_out = A.copy()
         for i in range(w):
             for j in range(h):
-                Y = A[0, i, j]
-                Cb = A[1, i, j]
-                Cr = A[2, i, j]
+                Y = A[i, j, 0]
+                Cb = A[i, j, 1]
+                Cr = A[i, j, 2]
                 YCbCr2RGB_fast_c(Y, Cb, Cr, &R, &G, &B)
-                A_out[0, i, j] = <int>R
-                A_out[1, i, j] = <int>G
-                A_out[2, i, j] = <int>B
+                A_out[i, j, 0] = <int>R
+                A_out[i, j, 1] = <int>G
+                A_out[i, j, 2] = <int>B
         return A_out
 
     cdef video_write(self, th_dec_ctx *td):
