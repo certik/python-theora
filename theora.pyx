@@ -220,19 +220,34 @@ cdef class Theora:
             raise Exception("Can't enlarge the matrix.")
         return B
 
+    def trim_offset(self, np.ndarray[np.uint8_t, ndim=2] A):
+        """
+        Trims the theora offset.
+
+        It uses self._ti.pic_x/pic_y/pic_width/pic_height to crop the image.
+        """
+        return A[self._ti.pic_y:self._ti.pic_y+self._ti.pic_height,
+                self._ti.pic_x:self._ti.pic_x+self._ti.pic_width]
 
     def YCbCr_tuple2array(self, YCbCr):
         """
         Converts the YCbCr tuple to one numpy (w, h, 3) array.
 
-        It also automatically rescales Cb and Cr if necessary (Theora encoder
-        sometimes reduces their width/height twice compared to Y).
+        It also implements the theora offset and also automatically rescales Cb
+        and Cr if necessary (Theora encoder sometimes reduces their
+        width/height twice compared to Y).
         """
         from numpy import concatenate
         Y, Cb, Cr = YCbCr
         w, h = Y.shape
+        # enlarge Cb and Cr if necessary:
         Cb = self.fix_size(Cb, w, h)
         Cr = self.fix_size(Cr, w, h)
+        # implement the theora offset:
+        Y = self.trim_offset(Y)
+        Cb = self.trim_offset(Cb)
+        Cr = self.trim_offset(Cr)
+        w, h = Y.shape
         Y = Y.reshape((w, h, 1))
         Cb = Cb.reshape((w, h, 1))
         Cr = Cr.reshape((w, h, 1))
@@ -265,7 +280,10 @@ cdef class Theora:
         Reads the image data and returns a tuple (Y, Cb, Cr).
 
         This is the lowest level API. Note that Cb and Cr may have twice lower
-        dimension than Y (the higher level API take care of that).
+        dimensions than Y (the higher level API takes care of that) and also
+        remember that this is the whole frame, so there might be some unused
+        areas, see self._ti.pic_x/pic_y/pic_width/pic_height (padding is
+        stripped though).
         """
         from numpy import zeros
         cdef th_ycbcr_buffer ycbcr
@@ -281,6 +299,7 @@ cdef class Theora:
             Yp = <char *>Y.data
             memcpy(Yp, ycbcr[i].data, n)
             Y = Y.reshape((ycbcr[i].height, ycbcr[i].stride))
+            # strip the padding:
             Y = Y[:, :ycbcr[i].width]
             r.append(Y)
         return r
