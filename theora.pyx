@@ -7,6 +7,7 @@ cdef extern from "stdlib.h":
 cdef extern from "theora/theoradec.h":
 
     ctypedef unsigned int ogg_uint32_t
+    ctypedef long long ogg_int64_t
 
     ctypedef struct ogg_sync_state:
         pass
@@ -49,6 +50,9 @@ cdef extern from "theora/theoradec.h":
              th_setup_info **_setup,ogg_packet *_op)
     int ogg_stream_clear(ogg_stream_state *os)
     th_dec_ctx *th_decode_alloc(th_info *_info, th_setup_info *_setup)
+    double th_granule_time(void *_encdec, ogg_int64_t _granpos)
+    int th_decode_packetin(th_dec_ctx *_dec, ogg_packet *_op,
+             ogg_int64_t *_granpos)
 
 cdef class Ogg:
     cdef object _infile
@@ -82,6 +86,7 @@ cdef class Ogg:
 
     def test(self):
         cdef ogg_stream_state test
+        cdef ogg_int64_t videobuf_granulepos = -1
         stateflag = True
         theora_p = False
         while stateflag:
@@ -138,4 +143,28 @@ cdef class Ogg:
         stateflag = 0
         while ogg_sync_pageout(&self._oy, &self._og) > 0:
             ogg_stream_pagein(&self._to, &self._og)
+        videobuf_ready = False
+        frames = 0
+        while 1:
+            while not videobuf_ready:
+                if ogg_stream_packetout(&self._to, &self._op) > 0:
+                    th_decode_packetin(self._td, &self._op,
+                            &videobuf_granulepos)
+                    videobuf_time = th_granule_time(self._td,
+                            videobuf_granulepos)
+                    videobuf_ready = True
+                    frames += 1
+                else:
+                    break
+            print "\rframe:%d" % frames
+            if not videobuf_ready and self._infile.EOF:
+                break
+            if not videobuf_ready:
+                self.buffer_data(&self._oy)
+                while ogg_sync_pageout(&self._oy, &self._og) > 0:
+                    ogg_stream_pagein(&self._to, &self._og)
+            #else:
+            #    self.video_write(self._td)
+            videobuf_ready = False
+
         print "ok"
