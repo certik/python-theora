@@ -275,18 +275,20 @@ cdef class Theora:
                     raise Exception("End of file while searching for headers 2")
         if self._ti.fps_denominator == 0:
             raise Exception("fps_denominator is zero")
-        print "Ogg logical stream %lx is Theora %dx%d %.02f fps video\n" \
-            "Encoded frame content is %dx%d with %dx%d offset\n" \
-            "Aspect: %d:%d\n" % (
+
+        self._td = th_decode_alloc(&self._ti, self._setup)
+        if self._td == NULL:
+            raise Exception("th_decode_alloc failed: the decoding parameters are invalid")
+
+    def __str__(self):
+        return "<Ogg logical stream %lx is Theora %dx%d %.02f fps video, " \
+            "encoded frame\ncontent is %dx%d with %dx%d offset, " \
+            "aspect is %d:%d>" % (
             self._to.serialno, self._ti.pic_width, self._ti.pic_height,
             float(self._ti.fps_numerator)/self._ti.fps_denominator,
             self._ti.frame_width, self._ti.frame_height,
             self._ti.pic_x, self._ti.pic_y,
             self._ti.aspect_numerator, self._ti.aspect_denominator)
-
-        self._td = th_decode_alloc(&self._ti, self._setup)
-        if self._td == NULL:
-            raise Exception("th_decode_alloc failed: the decoding parameters are invalid")
 
     def read_frame(self):
         """
