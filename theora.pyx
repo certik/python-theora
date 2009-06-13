@@ -90,7 +90,8 @@ cdef class Ogg:
     cdef ogg_packet _op
     cdef th_setup_info *_setup
     cdef th_dec_ctx *_td
-    cdef int _frames
+    cdef int _frame
+    cdef double _time
 
     def __init__(self, f):
         self._infile = f
@@ -98,11 +99,21 @@ cdef class Ogg:
         th_comment_init(&self._tc)
         th_info_init(&self._ti)
         self._setup = NULL
+        self._frame = 0
+        self._time = 0.
 
     def __del__(self):
         th_comment_clear(&self._tc)
         th_info_clear(&self._ti)
         ogg_sync_clear(&self._oy)
+
+    @property
+    def frame(self):
+        return self._frame
+
+    @property
+    def time(self):
+        return self._time
 
     cdef int buffer_data(self, ogg_sync_state *oy, int n=4096):
         """
@@ -259,27 +270,23 @@ cdef class Ogg:
         stateflag = 0
         while ogg_sync_pageout(&self._oy, &self._og) > 0:
             ogg_stream_pagein(&self._to, &self._og)
-        self._frames = 0
 
     def read_frame(self):
         cdef ogg_int64_t videobuf_granulepos = -1
         while 1:
-            while 1:
-                if ogg_stream_packetout(&self._to, &self._op) > 0:
-                    th_decode_packetin(self._td, &self._op,
-                            &videobuf_granulepos)
-                    videobuf_time = th_granule_time(self._td,
-                            videobuf_granulepos)
-                    print "video time:", videobuf_time
-                    self._frames += 1
-                    return
-                else:
-                    print "YES"
-                    break
-            print "\rframe:%d" % self._frames
-            self.buffer_data(&self._oy)
-            while ogg_sync_pageout(&self._oy, &self._og) > 0:
-                ogg_stream_pagein(&self._to, &self._og)
+            # do we have enough data to form a packet?
+            if ogg_stream_packetout(&self._to, &self._op) > 0:
+                # yes, decode it using theora and return
+                th_decode_packetin(self._td, &self._op,
+                        &videobuf_granulepos)
+                self._time = th_granule_time(self._td, videobuf_granulepos)
+                self._frame += 1
+                return
+            else:
+                # no, we need need more data
+                self.buffer_data(&self._oy)
+                while ogg_sync_pageout(&self._oy, &self._og) > 0:
+                    ogg_stream_pagein(&self._to, &self._og)
 
 cdef inline unsigned char clip(int a):
     if a > 255:
