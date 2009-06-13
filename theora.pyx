@@ -129,6 +129,8 @@ cdef class Ogg:
         cdef ndarray Y = zeros(n, dtype = "uint8")
         cdef char *Yp = <char *>Y.data
         memcpy(Yp, ycbcr[0].data, n)
+        Y = Y.reshape((ycbcr[0].height, ycbcr[0].stride))
+        Y = Y[:, :ycbcr[0].width]
         return Y
 
     def test(self):
