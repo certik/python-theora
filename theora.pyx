@@ -90,6 +90,7 @@ cdef class Ogg:
     cdef ogg_packet _op
     cdef th_setup_info *_setup
     cdef th_dec_ctx *_td
+    cdef int _frames
 
     def __init__(self, f):
         self._infile = f
@@ -161,10 +162,16 @@ cdef class Ogg:
                 A_out[i, j, 2] = <int>B
         return A_out
 
-    cdef video_write(self, th_dec_ctx *td):
+    def get_frame_data(self):
+        """
+        Reads the image data and returns a tuple (Y, Cb, Cr).
+
+        This is the lowest level API. Note that Cb and Cr may have twice lower
+        dimension than Y (the higher level API take care of that).
+        """
         from numpy import zeros
         cdef th_ycbcr_buffer ycbcr
-        if th_decode_ycbcr_out(td, ycbcr) != 0:
+        if th_decode_ycbcr_out(self._td, ycbcr) != 0:
             raise Exception("th_decode_ycbcr_out failed\n")
         cdef int n
         cdef ndarray Y
@@ -180,9 +187,19 @@ cdef class Ogg:
             r.append(Y)
         return r
 
+    def get_frame_image(self):
+        from scipy.misc import toimage
+        A = self.YCbCr_tuple2array(self.get_frame_data())
+        return toimage(self.YCbCr2RGB(A), channel_axis=2)
+
     def test(self):
+        self.read_headers()
+        self.read_frame()
+        ogg_stream_clear(&self._to)
+        th_decode_free(self._td)
+
+    def read_headers(self):
         cdef ogg_stream_state test
-        cdef ogg_int64_t videobuf_granulepos = -1
         stateflag = True
         theora_p = False
         while stateflag:
@@ -243,8 +260,12 @@ cdef class Ogg:
         while ogg_sync_pageout(&self._oy, &self._og) > 0:
             ogg_stream_pagein(&self._to, &self._og)
         videobuf_ready = False
-        frames = 0
-        while frames < 3:
+        self._frames = 0
+
+    def read_frame(self):
+        cdef ogg_int64_t videobuf_granulepos = -1
+        frames = self._frames
+        while frames == self._frames:
             while not videobuf_ready:
                 if ogg_stream_packetout(&self._to, &self._op) > 0:
                     th_decode_packetin(self._td, &self._op,
@@ -262,12 +283,9 @@ cdef class Ogg:
                 while ogg_sync_pageout(&self._oy, &self._og) > 0:
                     ogg_stream_pagein(&self._to, &self._og)
             else:
-                return self.video_write(self._td)
+                # read frame
+                break
             videobuf_ready = False
-
-        ogg_stream_clear(&self._to)
-        th_decode_free(self._td)
-        print "ok"
 
 cdef inline unsigned char clip(int a):
     if a > 255:
