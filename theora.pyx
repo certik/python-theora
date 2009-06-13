@@ -259,33 +259,27 @@ cdef class Ogg:
         stateflag = 0
         while ogg_sync_pageout(&self._oy, &self._og) > 0:
             ogg_stream_pagein(&self._to, &self._og)
-        videobuf_ready = False
         self._frames = 0
 
     def read_frame(self):
         cdef ogg_int64_t videobuf_granulepos = -1
-        frames = self._frames
-        while frames == self._frames:
-            while not videobuf_ready:
+        while 1:
+            while 1:
                 if ogg_stream_packetout(&self._to, &self._op) > 0:
                     th_decode_packetin(self._td, &self._op,
                             &videobuf_granulepos)
                     videobuf_time = th_granule_time(self._td,
                             videobuf_granulepos)
                     print "video time:", videobuf_time
-                    videobuf_ready = True
-                    frames += 1
+                    self._frames += 1
+                    return
                 else:
+                    print "YES"
                     break
-            print "\rframe:%d" % frames
-            if not videobuf_ready:
-                self.buffer_data(&self._oy)
-                while ogg_sync_pageout(&self._oy, &self._og) > 0:
-                    ogg_stream_pagein(&self._to, &self._og)
-            else:
-                # read frame
-                break
-            videobuf_ready = False
+            print "\rframe:%d" % self._frames
+            self.buffer_data(&self._oy)
+            while ogg_sync_pageout(&self._oy, &self._og) > 0:
+                ogg_stream_pagein(&self._to, &self._og)
 
 cdef inline unsigned char clip(int a):
     if a > 255:

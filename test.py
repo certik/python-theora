@@ -8,9 +8,10 @@ from pylab import imshow, show
 f = open("video.ogv")
 o = Ogg(f)
 o.read_headers()
-o.read_frame()
+for i in range(1000):
+    o.read_frame()
 img = o.get_frame_image()
-#img.save("frame.png")
+img.save("frame.png")
 
 imshow(img, origin="lower")
 show()
