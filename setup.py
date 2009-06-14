@@ -24,7 +24,7 @@ else:
         print "pkg-config could not find theoraenc theoradec: check PKG_CONFIG_PATH"
     else:
         print "pkg-config unavailable, build terminated"
-        sys.exit(1)
+    sys.exit(1)
 
 # there must be an easier way to set up these flags!
 iflags = [x[2:] for x in cflags.split() if x[0:2] == '-I']
