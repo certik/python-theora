@@ -81,6 +81,11 @@ cdef extern from "theora/theoradec.h":
     void th_comment_clear(th_comment *_tc)
     int th_decode_ycbcr_out(th_dec_ctx *_dec, th_ycbcr_buffer _ycbcr)
 
+cdef extern from "theora/theoraenc.h":
+    ctypedef struct th_enc_ctx:
+        pass
+    th_enc_ctx* th_encode_alloc(th_info *_info)
+
 cimport numpy as np
 
 cdef class Theora:
@@ -464,11 +469,11 @@ cdef class TheoraEncoder:
     #cdef ogg_sync_state _oy
     #cdef th_comment _tc
     cdef th_info _ti
+    cdef th_enc_ctx *_te
     #cdef ogg_page _og
     #cdef ogg_stream_state _to
     #cdef ogg_packet _op
     #cdef th_setup_info *_setup
-    #cdef th_dec_ctx *_td
     #cdef int _frame
     #cdef double _time
 
@@ -488,6 +493,8 @@ cdef class TheoraEncoder:
             self._ti.target_bitrate = bitrate
         if quality is not None:
             self._ti.quality = quality
+
+        self._te = th_encode_alloc(&self._ti)
 
 
     def write_frame(self, A):

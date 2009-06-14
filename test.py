@@ -1,20 +1,14 @@
 #! /usr/bin/env python
+from theora import Theora, TheoraEncoder
 
-from theora import Theora
-from pylab import imshow, show
-#import IPython
-#IPython.Shell.IPShell(user_ns=dict(globals(), **locals())).mainloop()
+#a = Theora("video.ogv")
+a = Theora("bbb_theora_325kbit.ogv")
+print a
+print "seeking"
+a.seek(time=10)
+print a.time, a.frame
 
-f = open("video.ogv")
-o = Theora(f)
-print o
-while o.read_frame():
-    break
-    print o.frame, o.time
-print "frame:", o.frame
-print "time:", o.time
-img = o.get_frame_image()
-img.save("frame.png")
+A = a.YCbCr_tuple2array(a.get_frame_data())
 
-imshow(img, origin="lower")
-show()
+b = TheoraEncoder("a.ogv", 400, 226)
+b.write_frame(A)

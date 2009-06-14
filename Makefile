@@ -9,7 +9,7 @@ test: test.c
 theora.so: theora.pyx
 	cython theora.pyx
 	gcc -I$(LIBTHEORA_PREFIX)/include -I/usr/include/python2.5 -I/usr/include/numpy -g -fPIC -c -o theora.o theora.c
-	gcc -L$(LIBTHEORA_PREFIX)/lib -shared -o theora.so theora.o -ltheoradec -logg
+	gcc -L$(LIBTHEORA_PREFIX)/lib -shared -o theora.so theora.o -ltheoradec -ltheoraenc -logg
 
 clean:
 	rm -f test.o test
