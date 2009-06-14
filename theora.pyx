@@ -4,6 +4,10 @@ cdef extern from "stdlib.h":
     void free(void *mem)
     void *memcpy(void *dst, void *src, long n)
 
+cdef extern from "Python.h":
+    object PyString_FromStringAndSize(char *v, int len)
+    int PyString_AsStringAndSize(object obj, char **buffer, Py_ssize_t* length) except -1
+
 cdef extern from "arrayobject.h":
 
     ctypedef int intp
@@ -24,7 +28,10 @@ cdef extern from "ogg/ogg.h":
     ctypedef struct ogg_stream_state:
         long serialno
     ctypedef struct ogg_page:
-        pass
+        unsigned char *header
+        long header_len
+        unsigned char *body
+        long body_len
     ctypedef struct ogg_packet:
         pass
     int ogg_stream_packetin(ogg_stream_state *os, ogg_packet *op)
@@ -564,12 +571,11 @@ cdef class TheoraEncoder:
 
     def write_headers(self):
         cdef th_comment comments
-        cdef int r
         th_comment_init(&comments)
-        r = th_encode_flushheader(self._te, &comments, &self._op)
-        while r > 0:
-            r = th_encode_flushheader(self._te, &comments, &self._op)
-        th_check(r, "th_encode_flushheader")
+        while self.th_encode_flushheader(&comments):
+            self.ogg_stream_packetin()
+            if self.ogg_stream_pageout():
+                self.write_buffer()
         th_comment_clear(&comments)
 
     def write_frame(self, A, last=False):
@@ -605,9 +611,32 @@ cdef class TheoraEncoder:
 
         while self.th_encode_packetout(last):
             self.ogg_stream_packetin()
+            if self.ogg_stream_pageout():
+                self.write_buffer()
 
-        if self.ogg_stream_pageout():
-            pass
+        # I think this is not necessary:
+        if last:
+            self.flush()
+
+    def flush(self):
+        """
+        Flushes any remaining data to the outfile.
+        """
+        if self.ogg_stream_flush():
+            if self.ogg_stream_pageout():
+                self.write_buffer()
+        self._outfile.flush()
+
+    cdef th_encode_flushheader(self, th_comment *comments):
+        """
+        Tries to retrieve a header packet from the theora encoder.
+
+        Returns True if a packet was retrieved, otherwise False.
+        """
+        cdef int r
+        r = th_encode_flushheader(self._te, comments, &self._op)
+        th_check(r, "th_encode_flushheader")
+        return r > 0
 
     cdef th_encode_packetout(self, last=False):
         """
@@ -640,3 +669,20 @@ cdef class TheoraEncoder:
         to form a page), False otherwise.
         """
         return ogg_stream_pageout(&self._os, &self._og) != 0
+
+    cdef ogg_stream_flush(self):
+        """
+        Flushes all remaining packets to the stream.
+
+        Returns True if anything was pushed, False otherwise.
+        """
+        return ogg_stream_flush(&self._os, &self._og) != 0
+
+    cdef write_buffer(self):
+        """
+        Write the ogg page to the outfile.
+        """
+        self._outfile.write(PyString_FromStringAndSize(<char*>(self._og.header),
+            self._og.header_len))
+        self._outfile.write(PyString_FromStringAndSize(<char*>(self._og.body),
+            self._og.body_len))

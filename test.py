@@ -4,12 +4,13 @@ from theora import Theora, TheoraEncoder
 #a = Theora("video.ogv")
 a = Theora("bbb_theora_325kbit.ogv")
 print a
-print "seeking"
-a.seek(time=10)
-print a.time, a.frame
-
-A = a.YCbCr_tuple2array(a.get_frame_data())
-
 b = TheoraEncoder("a.ogv", 400, 226)
 print b
-b.write_frame(A)
+while a.read_frame() and a.frame < 10:
+    print a.frame, a.time
+    A = a.YCbCr_tuple2array(a.get_frame_data())
+    b.write_frame(A)
+a.read_frame()
+A = a.YCbCr_tuple2array(a.get_frame_data())
+b.write_frame(A, last=True)
+b.flush()
