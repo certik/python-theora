@@ -410,7 +410,7 @@ cdef class Theora:
             while self.read_frame() and self.time < time:
                 pass
         elif frame is not None:
-            while self.read_frame() and self.frame < time:
+            while self.read_frame() and self.frame < frame:
                 pass
         else:
             raise ValueError("You must specify either the time or frame kwargs")
