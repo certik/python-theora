@@ -48,8 +48,6 @@ cdef extern from "theora/theoradec.h":
         pass
     ctypedef struct th_dec_ctx:
         pass
-    ctypedef struct th_ycbcr_buffer:
-        pass
     ctypedef struct th_img_plane:
         int width
         int height
@@ -546,6 +544,20 @@ cdef class TheoraEncoder:
         Writes another frame to outfile.
         """
         cdef int r
+        cdef int i
         cdef th_ycbcr_buffer ycbcr
+        cdef ndarray B
+        cdef int n
+        h, w, n = A.shape
+        n = w*h
+        L = []
+        for i in range(3):
+            ycbcr[i].width = w
+            ycbcr[i].height = h
+            ycbcr[i].stride = w
+            L.append(A[:, :, i].reshape(n).copy())
+            B = L[i]
+            ycbcr[i].data = <unsigned char*>(B.data)
+        #print w, h, self._ti.pic_width, self._ti.pic_height
         r = th_encode_ycbcr_in(self._te, ycbcr)
         th_check(r, "th_encode_ycbcr_in")
