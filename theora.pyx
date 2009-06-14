@@ -35,6 +35,9 @@ cdef extern from "theora/theoradec.h":
         ogg_uint32_t  fps_denominator
         ogg_uint32_t  aspect_numerator
         ogg_uint32_t  aspect_denominator
+        int     target_bitrate
+        int     quality
+        int     keyframe_granule_shift
     ctypedef struct ogg_stream_state:
         long serialno
     ctypedef struct ogg_page:
@@ -453,3 +456,42 @@ def YCbCr2RGB_fast(YCbCr):
     Y, Cb, Cr = YCbCr
     YCbCr2RGB_fast_c(Y, Cb, Cr, &R, &G, &B)
     return array([R, G, B], dtype="uint8")
+
+
+
+cdef class TheoraEncoder:
+    cdef object _outfile
+    #cdef ogg_sync_state _oy
+    #cdef th_comment _tc
+    cdef th_info _ti
+    #cdef ogg_page _og
+    #cdef ogg_stream_state _to
+    #cdef ogg_packet _op
+    #cdef th_setup_info *_setup
+    #cdef th_dec_ctx *_td
+    #cdef int _frame
+    #cdef double _time
+
+    def __init__(self, f, width, height, bitrate=None, quality=None):
+        if isinstance(f, (str, unicode)):
+            self._outfile = open(f, "w")
+        else:
+            self._outfile = f
+        th_info_init(&self._ti)
+        self._ti.frame_width = width
+        self._ti.frame_height = width
+        self._ti.pic_width = width
+        self._ti.pic_height = height
+        self._ti.pic_x = 0
+        self._ti.pic_y = 0
+        if bitrate is not None:
+            self._ti.target_bitrate = bitrate
+        if quality is not None:
+            self._ti.quality = quality
+
+
+    def write_frame(self, A):
+        """
+        Writes another frame to outfile.
+        """
+        pass
