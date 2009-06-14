@@ -87,9 +87,23 @@ cdef extern from "theora/theoraenc.h":
     th_enc_ctx* th_encode_alloc(th_info *_info)
     int th_encode_flushheader(th_enc_ctx *_enc, th_comment *_comments,
             ogg_packet *_op)
+    int th_encode_ycbcr_in(th_enc_ctx *_enc, th_ycbcr_buffer _ycbcr)
 
+
+cdef extern from "theora/theoraenc.h":
+    int TH_EFAULT
+    int TH_EINVAL
+    int TH_EBADHEADER
+    int TH_ENOTFORMAT
+    int TH_EVERSION
+    int TH_EIMPL
+    int TH_EBADPACKET
+    int TH_DUPFRAME
 
 cimport numpy as np
+
+class TheoraException(Exception):
+    pass
 
 cdef class Theora:
     """
@@ -465,7 +479,23 @@ def YCbCr2RGB_fast(YCbCr):
     YCbCr2RGB_fast_c(Y, Cb, Cr, &R, &G, &B)
     return array([R, G, B], dtype="uint8")
 
+err_messages = {
+        TH_EFAULT: "An invalid pointer was provided.",
+        TH_EINVAL: "An invalid argument was provided.",
+        TH_EBADHEADER: "The contents of the header were incomplete, invalid, or unexpected.",
+        TH_ENOTFORMAT: "The header does not belong to a Theora stream.",
+        TH_EVERSION: "The bitstream version is too high.",
+        TH_EIMPL: "The specified function is not implemented.",
+        TH_EBADPACKET: "There were errors in the video data packet.",
+        TH_DUPFRAME: "The decoded packet represented a dropped frame.",
+        }
 
+def th_check(int r, char *function):
+    if r < 0:
+        if r in err_messages:
+            raise TheoraException("%s: %s" % (function, err_messages[r]))
+        else:
+            raise TheoraException("%s returned: %d" % (function, r))
 
 cdef class TheoraEncoder:
     cdef object _outfile
@@ -508,12 +538,14 @@ cdef class TheoraEncoder:
         r = th_encode_flushheader(self._te, &comments, &self._op)
         while r > 0:
             r = th_encode_flushheader(self._te, &comments, &self._op)
-        if r < 0:
-            raise Exception("th_encode_flushheader returned: %d" % r)
+        th_check(r, "th_encode_flushheader")
         th_comment_clear(&comments)
 
     def write_frame(self, A):
         """
         Writes another frame to outfile.
         """
-        pass
+        cdef int r
+        cdef th_ycbcr_buffer ycbcr
+        r = th_encode_ycbcr_in(self._te, ycbcr)
+        th_check(r, "th_encode_ycbcr_in")
