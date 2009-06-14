@@ -591,6 +591,31 @@ cdef class TheoraEncoder:
                 self.write_buffer()
         th_comment_clear(&comments)
 
+    def fix_size(self, np.ndarray[np.uint8_t, ndim=2] A, int h, int w):
+        """
+        Compresses the matrix A to fit into the (w, h) shape.
+
+        Currently it can only half each dimension.
+        """
+        cdef int i, j
+        from numpy import zeros
+        cdef np.ndarray[np.uint8_t, ndim=2] B = zeros((w, h), dtype="uint8")
+        if A.shape[0] == w*2 and A.shape[1] == h*2:
+            for i in range(w):
+                for j in range(h):
+                    B[i, j] = A[i*2, j*2]
+        elif A.shape[0] == w*2 and A.shape[1] == h:
+            for i in range(w):
+                for j in range(h):
+                    B[i, j] = A[i*2, j]
+        elif A.shape[0] == w and A.shape[1] == h:
+            for i in range(w):
+                for j in range(h):
+                    B[i, j] = A[i, j]
+        else:
+            raise Exception("Can't compress the matrix.")
+        return B
+
     def write_frame(self, A, last=False):
         """
         Writes another frame to outfile.
@@ -612,11 +637,14 @@ cdef class TheoraEncoder:
                 ycbcr[i].width = self._ti.frame_width
                 ycbcr[i].height = self._ti.frame_height
                 ycbcr[i].stride = w
+                L.append(A[:, :, i].reshape(n2).copy())
             else:
                 ycbcr[i].width = self._ti.frame_width // 2
                 ycbcr[i].height = self._ti.frame_height // 2
                 ycbcr[i].stride = w // 2
-            L.append(A[:, :, i].reshape(n2).copy())
+                B = self.fix_size(A[:, :, i], w//2, h//2)
+                n = n2//4
+                L.append(B.reshape(n).copy())
             B = L[i]
             ycbcr[i].data = <unsigned char*>(B.data)
         r = th_encode_ycbcr_in(self._te, ycbcr)

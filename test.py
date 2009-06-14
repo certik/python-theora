@@ -7,7 +7,7 @@ print a
 b = TheoraEncoder("a.ogv", 400, 226)
 print b
 a.seek(time=10)
-while a.read_frame() and a.time < 15:
+while a.read_frame() and a.time < 12:
     print a.frame, a.time
     A = a.get_frame_array()
     b.write_frame(A)
