@@ -4,10 +4,10 @@ from theora import Theora, TheoraEncoder
 #a = Theora("video.ogv")
 a = Theora("bbb_theora_325kbit.ogv")
 print a
-b = TheoraEncoder("a.ogv", 400, 226)
+b = TheoraEncoder("a.ogv", a.width, a.height, quality=63)
 print b
 a.seek(time=10)
-while a.read_frame() and a.time < 12:
+while a.read_frame() and a.time < 20:
     print a.frame, a.time
     A = a.get_frame_array()
     b.write_frame(A)

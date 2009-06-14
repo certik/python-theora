@@ -226,6 +226,14 @@ cdef class Theora:
     def time(self):
         return self._time
 
+    @property
+    def width(self):
+        return self._ti.pic_width
+
+    @property
+    def height(self):
+        return self._ti.pic_height
+
     cdef int buffer_data(self, int n=4096):
         """
         Reads "n" bytes from self._infile into the ogg_sync_state "oy".
