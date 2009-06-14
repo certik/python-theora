@@ -347,10 +347,23 @@ cdef class Theora:
             r.append(Y)
         return r
 
+    def get_frame_array(self):
+        """
+        Returns the frame image data as a numpy (h, w, 3) array.
+
+        This performs Cb and Cr components enlarging, as well as offset
+        cropping.
+
+        For accessing raw data, use get_frame_data().
+        """
+        return self.YCbCr_tuple2array(self.get_frame_data())
+
     def get_frame_image(self):
+        """
+        Returns the frame image data as a PIL image.
+        """
         from scipy.misc import toimage
-        A = self.YCbCr_tuple2array(self.get_frame_data())
-        return toimage(self.YCbCr2RGB(A), channel_axis=2)
+        return toimage(self.YCbCr2RGB(self.get_frame_array()), channel_axis=2)
 
     def read_headers(self):
         """

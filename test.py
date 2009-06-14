@@ -6,11 +6,12 @@ a = Theora("bbb_theora_325kbit.ogv")
 print a
 b = TheoraEncoder("a.ogv", 400, 226)
 print b
-while a.read_frame() and a.frame < 10:
+a.seek(time=10)
+while a.read_frame() and a.time < 15:
     print a.frame, a.time
-    A = a.YCbCr_tuple2array(a.get_frame_data())
+    A = a.get_frame_array()
     b.write_frame(A)
 a.read_frame()
-A = a.YCbCr_tuple2array(a.get_frame_data())
+A = a.get_frame_array()
 b.write_frame(A, last=True)
 b.flush()
