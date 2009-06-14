@@ -94,6 +94,7 @@ cdef extern from "theora/theoraenc.h":
             ogg_packet *_op)
     int th_encode_ycbcr_in(th_enc_ctx *_enc, th_ycbcr_buffer _ycbcr)
     int th_encode_packetout(th_enc_ctx *_enc, int _last, ogg_packet *_op)
+    void th_encode_free(th_enc_ctx *_enc)
 
 
 cdef extern from "theora/theoraenc.h":
@@ -543,6 +544,9 @@ cdef class TheoraEncoder:
         if self._te == NULL:
             raise TheoraException("th_encode_alloc returned NULL.")
         self.write_headers()
+
+    def __del__(self):
+        th_encode_free(self._te)
 
     def __str__(self):
         return "<Ogg logical stream is Theora %dx%d %.02f fps video, " \
