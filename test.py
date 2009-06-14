@@ -11,4 +11,5 @@ print a.time, a.frame
 A = a.YCbCr_tuple2array(a.get_frame_data())
 
 b = TheoraEncoder("a.ogv", 400, 226)
+print b
 b.write_frame(A)

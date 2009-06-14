@@ -18,6 +18,7 @@ cdef extern from "arrayobject.h":
 cdef extern from "theora/theoradec.h":
 
     ctypedef unsigned int ogg_uint32_t
+    ctypedef unsigned int th_pixel_fmt
     ctypedef long long ogg_int64_t
 
     ctypedef struct ogg_sync_state:
@@ -31,6 +32,7 @@ cdef extern from "theora/theoradec.h":
         ogg_uint32_t  pic_height
         ogg_uint32_t  pic_x
         ogg_uint32_t  pic_y
+        th_pixel_fmt  pixel_fmt
         ogg_uint32_t  fps_numerator
         ogg_uint32_t  fps_denominator
         ogg_uint32_t  aspect_numerator
@@ -38,6 +40,11 @@ cdef extern from "theora/theoradec.h":
         int     target_bitrate
         int     quality
         int     keyframe_granule_shift
+    int TH_PF_420
+    int TH_PF_RSVD
+    int TH_PF_422
+    int TH_PF_444
+    int TH_PF_NFORMATS
     ctypedef struct ogg_stream_state:
         long serialno
     ctypedef struct ogg_page:
@@ -514,12 +521,18 @@ cdef class TheoraEncoder:
         else:
             self._outfile = f
         th_info_init(&self._ti)
-        self._ti.frame_width = width
-        self._ti.frame_height = width
+        # TODO: make the below thing not increment 16 if w is exactly divisible
+        # by 16:
+        self._ti.frame_width = (width // 16 + 1) * 16
+        self._ti.frame_height = (height // 16 + 1) * 16
         self._ti.pic_width = width
         self._ti.pic_height = height
         self._ti.pic_x = 0
         self._ti.pic_y = 0
+        # the encoder doesn't support anything else besides 4:2:0 currently
+        self._ti.pixel_fmt = TH_PF_420
+        self._ti.fps_numerator = 25
+        self._ti.fps_denominator = 1
         if bitrate is not None:
             self._ti.target_bitrate = bitrate
         if quality is not None:
@@ -530,6 +543,15 @@ cdef class TheoraEncoder:
             raise TheoraException("th_encode_alloc returned NULL.")
         self.write_headers()
 
+    def __str__(self):
+        return "<Ogg logical stream is Theora %dx%d %.02f fps video, " \
+            "encoded frame\ncontent is %dx%d with %dx%d offset, " \
+            "aspect is %d:%d>" % (
+            self._ti.pic_width, self._ti.pic_height,
+            float(self._ti.fps_numerator)/self._ti.fps_denominator,
+            self._ti.frame_width, self._ti.frame_height,
+            self._ti.pic_x, self._ti.pic_y,
+            self._ti.aspect_numerator, self._ti.aspect_denominator)
 
     def write_headers(self):
         cdef th_comment comments
@@ -551,15 +573,20 @@ cdef class TheoraEncoder:
         cdef ndarray B
         cdef int n
         h, w, n = A.shape
-        n = w*h
+        n2 = w*h
+
         L = []
         for i in range(3):
-            ycbcr[i].width = w
-            ycbcr[i].height = h
-            ycbcr[i].stride = w
-            L.append(A[:, :, i].reshape(n).copy())
+            if i == 0:
+                ycbcr[i].width = self._ti.frame_width
+                ycbcr[i].height = self._ti.frame_height
+                ycbcr[i].stride = w
+            else:
+                ycbcr[i].width = self._ti.frame_width // 2
+                ycbcr[i].height = self._ti.frame_height // 2
+                ycbcr[i].stride = w // 2
+            L.append(A[:, :, i].reshape(n2).copy())
             B = L[i]
             ycbcr[i].data = <unsigned char*>(B.data)
-        #print w, h, self._ti.pic_width, self._ti.pic_height
         r = th_encode_ycbcr_in(self._te, ycbcr)
         th_check(r, "th_encode_ycbcr_in")
