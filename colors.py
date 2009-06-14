@@ -6,8 +6,13 @@ YPbPr ....... 0.0 - 1.0
 RGB_float ... 0.0 - 1.0
 RGB ......... 0 - 255
 
+Well, in fact:
+
+Y' is 16...235, and Cb and Cr are 16...240.
+
 This is implemented in pure Python and numpy matrices, so it's slow, but simple
 and readable, so it serves as a reference implementation.
+
 """
 
 from numpy import array, dot, round
