@@ -568,9 +568,12 @@ cdef class TheoraEncoder:
         th_check(r, "th_encode_flushheader")
         th_comment_clear(&comments)
 
-    def write_frame(self, A):
+    def write_frame(self, A, last=False):
         """
         Writes another frame to outfile.
+
+        last .... Set it to true for the last frame, so that the proper EOS
+                  flag is set on the last packet
         """
         cdef int r
         cdef int i
@@ -596,7 +599,12 @@ cdef class TheoraEncoder:
         r = th_encode_ycbcr_in(self._te, ycbcr)
         th_check(r, "th_encode_ycbcr_in")
 
-        r = th_encode_packetout(self._te, 0, &self._op)
+        cdef int _last
+        if last:
+            _last = 1
+        else:
+            _last = 0
+        r = th_encode_packetout(self._te, _last, &self._op)
         while r > 0:
-            r = th_encode_packetout(self._te, 0, &self._op)
+            r = th_encode_packetout(self._te, _last, &self._op)
         th_check(r, "th_encode_packetout")
