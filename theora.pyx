@@ -15,14 +15,37 @@ cdef extern from "arrayobject.h":
         cdef intp *strides
         cdef int flags
 
-cdef extern from "theora/theoradec.h":
-
+cdef extern from "ogg/ogg.h":
     ctypedef unsigned int ogg_uint32_t
-    ctypedef unsigned int th_pixel_fmt
     ctypedef long long ogg_int64_t
 
     ctypedef struct ogg_sync_state:
         pass
+    ctypedef struct ogg_stream_state:
+        long serialno
+    ctypedef struct ogg_page:
+        pass
+    ctypedef struct ogg_packet:
+        pass
+    int ogg_stream_packetin(ogg_stream_state *os, ogg_packet *op)
+    int ogg_stream_pageout(ogg_stream_state *os, ogg_page *og)
+    int ogg_stream_flush(ogg_stream_state *os, ogg_page *og)
+    int ogg_sync_init(ogg_sync_state *oy)
+    char *ogg_sync_buffer(ogg_sync_state *oy, long size)
+    int ogg_sync_wrote(ogg_sync_state *oy, long bytes)
+    int ogg_sync_pageout(ogg_sync_state *oy, ogg_page *og)
+    int ogg_page_bos(ogg_page *og)
+    int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og)
+    int ogg_page_serialno(ogg_page *og)
+    int ogg_stream_init(ogg_stream_state *os, int serialno)
+    int ogg_stream_packetout(ogg_stream_state *os, ogg_packet *op)
+    int ogg_stream_clear(ogg_stream_state *os)
+    int ogg_sync_clear(ogg_sync_state *oy)
+
+
+cdef extern from "theora/theoradec.h":
+
+    ctypedef unsigned int th_pixel_fmt
     ctypedef struct th_comment:
         pass
     ctypedef struct th_info:
@@ -45,12 +68,6 @@ cdef extern from "theora/theoradec.h":
     int TH_PF_422
     int TH_PF_444
     int TH_PF_NFORMATS
-    ctypedef struct ogg_stream_state:
-        long serialno
-    ctypedef struct ogg_page:
-        pass
-    ctypedef struct ogg_packet:
-        pass
     ctypedef struct th_setup_info:
         pass
     ctypedef struct th_dec_ctx:
@@ -62,42 +79,23 @@ cdef extern from "theora/theoradec.h":
         unsigned char *data
     ctypedef th_img_plane th_ycbcr_buffer[3]
 
-    int ogg_sync_init(ogg_sync_state *oy)
     void th_comment_init(th_comment *_tc)
     void th_info_init(th_info *_info)
-    char *ogg_sync_buffer(ogg_sync_state *oy, long size)
-    int ogg_sync_wrote(ogg_sync_state *oy, long bytes)
-    int ogg_sync_pageout(ogg_sync_state *oy, ogg_page *og)
-    int ogg_page_bos(ogg_page *og)
-    int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og)
-    int ogg_page_serialno(ogg_page *og)
-    int ogg_stream_init(ogg_stream_state *os, int serialno)
-    int ogg_stream_packetout(ogg_stream_state *os, ogg_packet *op)
     int th_decode_headerin(th_info *_info,th_comment *_tc,
              th_setup_info **_setup,ogg_packet *_op)
-    int ogg_stream_clear(ogg_stream_state *os)
     th_dec_ctx *th_decode_alloc(th_info *_info, th_setup_info *_setup)
     double th_granule_time(void *_encdec, ogg_int64_t _granpos)
     int th_decode_packetin(th_dec_ctx *_dec, ogg_packet *_op,
              ogg_int64_t *_granpos)
     void th_decode_free(th_dec_ctx *_dec)
-    int ogg_sync_clear(ogg_sync_state *oy)
     void th_info_clear(th_info *_info)
     void th_comment_clear(th_comment *_tc)
     int th_decode_ycbcr_out(th_dec_ctx *_dec, th_ycbcr_buffer _ycbcr)
 
+
 cdef extern from "theora/theoraenc.h":
     ctypedef struct th_enc_ctx:
         pass
-    th_enc_ctx* th_encode_alloc(th_info *_info)
-    int th_encode_flushheader(th_enc_ctx *_enc, th_comment *_comments,
-            ogg_packet *_op)
-    int th_encode_ycbcr_in(th_enc_ctx *_enc, th_ycbcr_buffer _ycbcr)
-    int th_encode_packetout(th_enc_ctx *_enc, int _last, ogg_packet *_op)
-    void th_encode_free(th_enc_ctx *_enc)
-
-
-cdef extern from "theora/theoraenc.h":
     int TH_EFAULT
     int TH_EINVAL
     int TH_EBADHEADER
@@ -106,6 +104,12 @@ cdef extern from "theora/theoraenc.h":
     int TH_EIMPL
     int TH_EBADPACKET
     int TH_DUPFRAME
+    th_enc_ctx* th_encode_alloc(th_info *_info)
+    int th_encode_flushheader(th_enc_ctx *_enc, th_comment *_comments,
+            ogg_packet *_op)
+    int th_encode_ycbcr_in(th_enc_ctx *_enc, th_ycbcr_buffer _ycbcr)
+    int th_encode_packetout(th_enc_ctx *_enc, int _last, ogg_packet *_op)
+    void th_encode_free(th_enc_ctx *_enc)
 
 cimport numpy as np
 
@@ -510,8 +514,8 @@ cdef class TheoraEncoder:
     #cdef th_comment _tc
     cdef th_info _ti
     cdef th_enc_ctx *_te
-    #cdef ogg_page _og
-    #cdef ogg_stream_state _to
+    cdef ogg_page _og
+    cdef ogg_stream_state _os
     cdef ogg_packet _op
     #cdef th_setup_info *_setup
     #cdef int _frame
@@ -608,3 +612,9 @@ cdef class TheoraEncoder:
         while r > 0:
             r = th_encode_packetout(self._te, _last, &self._op)
         th_check(r, "th_encode_packetout")
+
+        if ogg_stream_packetin(&self._os, &self._op) != 0:
+            raise Exception("ogg_stream_packetin: internal error")
+        if ogg_stream_pageout(&self._os, &self._og) != 0:
+            # page submitted to self._og
+            pass
