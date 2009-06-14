@@ -93,6 +93,7 @@ cdef extern from "theora/theoraenc.h":
     int th_encode_flushheader(th_enc_ctx *_enc, th_comment *_comments,
             ogg_packet *_op)
     int th_encode_ycbcr_in(th_enc_ctx *_enc, th_ycbcr_buffer _ycbcr)
+    int th_encode_packetout(th_enc_ctx *_enc, int _last, ogg_packet *_op)
 
 
 cdef extern from "theora/theoraenc.h":
@@ -590,3 +591,8 @@ cdef class TheoraEncoder:
             ycbcr[i].data = <unsigned char*>(B.data)
         r = th_encode_ycbcr_in(self._te, ycbcr)
         th_check(r, "th_encode_ycbcr_in")
+
+        r = th_encode_packetout(self._te, 0, &self._op)
+        while r > 0:
+            r = th_encode_packetout(self._te, 0, &self._op)
+        th_check(r, "th_encode_packetout")
