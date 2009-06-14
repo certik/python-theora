@@ -526,6 +526,8 @@ cdef class TheoraEncoder:
             self._ti.quality = quality
 
         self._te = th_encode_alloc(&self._ti)
+        if self._te == NULL:
+            raise TheoraException("th_encode_alloc returned NULL.")
         self.write_headers()
 
 
