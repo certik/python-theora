@@ -603,18 +603,40 @@ cdef class TheoraEncoder:
         r = th_encode_ycbcr_in(self._te, ycbcr)
         th_check(r, "th_encode_ycbcr_in")
 
+        while self.th_encode_packetout(last):
+            self.ogg_stream_packetin()
+
+        if self.ogg_stream_pageout():
+            pass
+
+    cdef th_encode_packetout(self, last=False):
+        """
+        Tries to retrieve a raw packet from the theora encoder.
+
+        Returns True if a packet was retrieved, otherwise False.
+        """
+        cdef int r
         cdef int _last
         if last:
             _last = 1
         else:
             _last = 0
         r = th_encode_packetout(self._te, _last, &self._op)
-        while r > 0:
-            r = th_encode_packetout(self._te, _last, &self._op)
         th_check(r, "th_encode_packetout")
+        return r > 0
 
+    cdef ogg_stream_packetin(self):
+        """
+        Submits a raw packet to the stream.
+        """
         if ogg_stream_packetin(&self._os, &self._op) != 0:
             raise Exception("ogg_stream_packetin: internal error")
-        if ogg_stream_pageout(&self._os, &self._og) != 0:
-            # page submitted to self._og
-            pass
+
+    cdef ogg_stream_pageout(self):
+        """
+        Tries to retrieve a page from the stream.
+
+        Returns True if a page was retrieved (e.g. enough data has accumulated
+        to form a page), False otherwise.
+        """
+        return ogg_stream_pageout(&self._os, &self._og) != 0
