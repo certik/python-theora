@@ -85,6 +85,9 @@ cdef extern from "theora/theoraenc.h":
     ctypedef struct th_enc_ctx:
         pass
     th_enc_ctx* th_encode_alloc(th_info *_info)
+    int th_encode_flushheader(th_enc_ctx *_enc, th_comment *_comments,
+            ogg_packet *_op)
+
 
 cimport numpy as np
 
@@ -472,7 +475,7 @@ cdef class TheoraEncoder:
     cdef th_enc_ctx *_te
     #cdef ogg_page _og
     #cdef ogg_stream_state _to
-    #cdef ogg_packet _op
+    cdef ogg_packet _op
     #cdef th_setup_info *_setup
     #cdef int _frame
     #cdef double _time
@@ -495,7 +498,19 @@ cdef class TheoraEncoder:
             self._ti.quality = quality
 
         self._te = th_encode_alloc(&self._ti)
+        self.write_headers()
 
+
+    def write_headers(self):
+        cdef th_comment comments
+        cdef int r
+        th_comment_init(&comments)
+        r = th_encode_flushheader(self._te, &comments, &self._op)
+        while r > 0:
+            r = th_encode_flushheader(self._te, &comments, &self._op)
+        if r < 0:
+            raise Exception("th_encode_flushheader returned: %d" % r)
+        th_comment_clear(&comments)
 
     def write_frame(self, A):
         """
