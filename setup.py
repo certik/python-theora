@@ -1,3 +1,5 @@
+#! /usr/bin/env python
+
 from distutils.core import setup
 from distutils.extension import Extension
 from Cython.Distutils import build_ext
@@ -32,7 +34,7 @@ extra_cflags = [x for x in cflags.split() if x[0:2] != '-I']
 libdirs = [x[2:] for x in libs.split() if x[0:2] == '-L']
 libsonly = [x[2:] for x in libs.split() if x[0:2] == '-l']
 
-#numarray
+# numpy
 iflags += ['/usr/include/numpy', ]
 
 theora = Extension('theora', sources = ['theora.pyx'],
@@ -52,9 +54,9 @@ setup(
     author_email = 'ondrej@certik.cz',
     classifiers = [
         'Development Status :: 3 - Alpha',
+        'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
         'Programming Language :: C',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
 )
-
