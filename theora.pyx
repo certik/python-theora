@@ -120,6 +120,20 @@ cdef extern from "theora/theoraenc.h":
 
 cimport numpy as np
 
+# The VIDEO_DIR below point to the directory with test files and the test_files
+# dictionary points to the particular test files (we use a dictionary with
+# numbers pointing to the files, so that if we deprecate some test file in the
+# future, we can simply comment it out below and change just those tests, as
+# opposed to renumbering all tests). This is used in both regular tests and
+# doctests (that's why it has to be here).
+VIDEO_DIR = "tests/videos"
+test_files = {
+        1: VIDEO_DIR + "/320x240.ogg",
+        2: VIDEO_DIR + "/videotestsrc-720x576-16-15.ogg",
+        3: VIDEO_DIR + "/offset_test.ogv",
+        }
+
+
 class TheoraException(Exception):
     pass
 
