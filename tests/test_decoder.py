@@ -49,3 +49,11 @@ def test_PIL_image():
     t.read_frame()
     img = t.get_frame_image()
     img.save(VIDEO_DIR + "/a.png")
+
+def test_mpl():
+    t = Theora(test_file1)
+    t.read_frame()
+    A = t.get_frame_array()
+    import pylab
+    pylab.imshow(t.YCbCr2RGB(A))
+    pylab.savefig(VIDEO_DIR + "/b.png")
