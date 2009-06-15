@@ -143,40 +143,39 @@ cdef class Theora:
 
     It can read frames as numpy arrays or PIL images.
 
-    Example of usage:
-    -----------------
+    Example of usage::
 
-    >>> from theora import Theora, test_files, VIDEO_DIR
-    >>> t = Theora(test_files[2])
-    >>> print t
-    <Ogg logical stream 11f68f2c is Theora 720x576 25.00 fps video, encoded frame
-    content is 720x576 with 0x0 offset, aspect is 16:15>
-    >>> t.read_frame()
-    True
-    >>> t.read_frame()
-    True
-    >>> t.get_frame_data()
-    [array([[254, 254, 254, ...,  28,  28,  28],
-           [254, 254, 254, ...,  28,  28,  28],
-           [254, 254, 254, ...,  28,  28,  28],
-           ..., 
-           [ 16,  16,  16, ..., 169,  97,  88],
-           [ 16,  16,  16, ..., 125,  70, 169],
-           [ 16,  16,  16, ...,  19,  94, 161]], dtype=uint8), array([[128, 128, 128, ..., 255, 255, 255],
-           [128, 128, 128, ..., 255, 255, 255],
-           [128, 128, 128, ..., 255, 255, 255],
-           ..., 
-           [197, 197, 197, ..., 128, 128, 128],
-           [197, 197, 197, ..., 128, 128, 128],
-           [197, 197, 197, ..., 128, 128, 128]], dtype=uint8), array([[128, 128, 128, ..., 107, 107, 107],
-           [128, 128, 128, ..., 107, 107, 107],
-           [128, 128, 128, ..., 107, 107, 107],
-           ..., 
-           [ 21,  21,  21, ..., 128, 128, 128],
-           [ 21,  21,  21, ..., 128, 128, 128],
-           [ 21,  21,  21, ..., 128, 128, 128]], dtype=uint8)]
-    >>> img = t.get_frame_image()
-    >>> img.save(VIDEO_DIR+"c.png")
+        >>> from theora import Theora, test_files, VIDEO_DIR
+        >>> t = Theora(test_files[2])
+        >>> print t
+        <Ogg logical stream 11f68f2c is Theora 720x576 25.00 fps video, encoded frame
+        content is 720x576 with 0x0 offset, aspect is 16:15>
+        >>> t.read_frame()
+        True
+        >>> t.read_frame()
+        True
+        >>> t.get_frame_data()
+        [array([[254, 254, 254, ...,  28,  28,  28],
+               [254, 254, 254, ...,  28,  28,  28],
+               [254, 254, 254, ...,  28,  28,  28],
+               ..., 
+               [ 16,  16,  16, ..., 169,  97,  88],
+               [ 16,  16,  16, ..., 125,  70, 169],
+               [ 16,  16,  16, ...,  19,  94, 161]], dtype=uint8), array([[128, 128, 128, ..., 255, 255, 255],
+               [128, 128, 128, ..., 255, 255, 255],
+               [128, 128, 128, ..., 255, 255, 255],
+               ..., 
+               [197, 197, 197, ..., 128, 128, 128],
+               [197, 197, 197, ..., 128, 128, 128],
+               [197, 197, 197, ..., 128, 128, 128]], dtype=uint8), array([[128, 128, 128, ..., 107, 107, 107],
+               [128, 128, 128, ..., 107, 107, 107],
+               [128, 128, 128, ..., 107, 107, 107],
+               ..., 
+               [ 21,  21,  21, ..., 128, 128, 128],
+               [ 21,  21,  21, ..., 128, 128, 128],
+               [ 21,  21,  21, ..., 128, 128, 128]], dtype=uint8)]
+        >>> img = t.get_frame_image()
+        >>> img.save(VIDEO_DIR+"c.png")
 
     """
     cdef object _infile
