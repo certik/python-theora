@@ -57,3 +57,21 @@ def test_mpl():
     import pylab
     pylab.imshow(t.YCbCr2RGB(A))
     pylab.savefig(VIDEO_DIR + "/b.png")
+
+def test_seek1():
+    t = Theora(test_file1)
+    t.seek(0.75)
+    assert t.time > 0.75
+    assert t.frame == 23
+
+def test_seek2():
+    t = Theora(test_file1)
+    t.seek(time=0.75)
+    assert t.time > 0.75
+    assert t.frame == 23
+
+def test_seek3():
+    t = Theora(test_file1)
+    t.seek(frame=23)
+    assert t.time > 0.75
+    assert t.frame == 23
