@@ -239,6 +239,10 @@ cdef class Theora:
         return self._ti.aspect_numerator, self._ti.aspect_denominator
 
     @property
+    def serialno(self):
+        return self._to.serialno
+
+    @property
     def fps_ratio(self):
         return self._ti.fps_numerator, self._ti.fps_denominator
 
