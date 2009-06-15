@@ -991,6 +991,16 @@ cdef class TheoraEncoder:
             self._ti.aspect_numerator, self._ti.aspect_denominator)
 
     def write_headers(self):
+        """
+        Writes the headers, this is called from __init__() automatically.
+
+        Don't call this yourself. It should not cause any problems though:
+
+        >>> from theora import TheoraEncoder, VIDEO_DIR
+        >>> a = TheoraEncoder(VIDEO_DIR+"/b.ogv", 100, 100)
+        >>> a.write_headers()
+
+        """
         cdef th_comment comments
         th_comment_init(&comments)
         while self.th_encode_flushheader(&comments):
