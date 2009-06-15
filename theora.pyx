@@ -828,6 +828,7 @@ cdef class Theora:
         Currently it can only seek forward.
 
         Example:
+
         >>> from theora import Theora, test_files
         >>> a = Theora(test_files[1])
         >>> a.seek(1)  # seeks to 1s
