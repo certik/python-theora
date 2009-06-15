@@ -1113,6 +1113,18 @@ cdef class TheoraEncoder:
     def flush(self):
         """
         Flushes any remaining data to the outfile.
+
+        Example:
+
+        >>> from theora import Theora, TheoraEncoder, test_files, VIDEO_DIR
+        >>> a = Theora(test_files[1])
+        >>> b = TheoraEncoder(VIDEO_DIR+"/b.ogv", a.width, a.height)
+        >>> a.read_frame()
+        True
+        >>> A = a.get_frame_array()
+        >>> b.write_frame_array(A)
+        >>> b.flush()
+
         """
         if self.ogg_stream_flush():
             if self.ogg_stream_pageout():
