@@ -486,6 +486,24 @@ cdef class Theora:
         It also implements the theora offset and also automatically rescales Cb
         and Cr if necessary (Theora encoder sometimes reduces their
         width/height twice compared to Y).
+
+        Example:
+
+        >>> from theora import Theora, test_files
+        >>> t = Theora(test_files[3])
+        >>> t.read_frame()
+        True
+        >>> Y, Cb, Cr = t.get_frame_data()
+        >>> Y.shape
+        (784, 768)
+        >>> Cb.shape
+        (392, 384)
+        >>> Cr.shape
+        (392, 384)
+        >>> A = t.YCbCr_tuple2array((Y, Cb, Cr))
+        >>> A.shape
+        (512, 512, 3)
+
         """
         from numpy import concatenate
         Y, Cb, Cr = YCbCr
