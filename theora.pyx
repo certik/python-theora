@@ -456,6 +456,8 @@ cdef class Theora:
     def read_headers(self):
         """
         Reads headers of the theora file.
+
+        This is called from the __init__() automatically.
         """
         cdef ogg_stream_state test
         stateflag = True
@@ -519,7 +521,20 @@ cdef class Theora:
 
     def read_frame(self):
         """
-        Reads the next frame and returns.
+        Reads the next frame.
+
+        Returns True if the next frame was read, otherwise False (which means
+        the EOF was reached).
+
+        Example:
+
+        >>> from theora import Theora, test_files
+        >>> t = Theora(test_files[2])
+        >>> t.read_frame()
+        True
+        >>> t.read_frame()
+        True
+
         """
         cdef ogg_int64_t videobuf_granulepos = -1
         while 1:
