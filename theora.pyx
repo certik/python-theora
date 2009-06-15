@@ -272,6 +272,25 @@ cdef class Theora:
 
     @property
     def width(self):
+        """
+        Returns the width of the video.
+
+        This property can be used immediately after creating the instance.
+
+        Example:
+
+        >>> from theora import Theora, test_files
+        >>> t = Theora(test_files[2])
+        >>> print t.width
+        720
+        >>> print t.height
+        576
+        >>> assert t.aspect_ratio == (16, 15)
+        >>> t.serialno
+        301371180
+        >>> assert t.fps_ratio == (250000000, 10000000)
+
+        """
         return self._ti.pic_width
 
     @property
