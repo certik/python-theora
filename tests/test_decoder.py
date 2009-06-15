@@ -1,8 +1,9 @@
 from theora import Theora
 
-test_file1 = "tests/videos/320x240.ogg"
-test_file2 = "tests/videos/videotestsrc-720x576-16-15.ogg"
-test_file3 = "tests/videos/offset_test.ogv"
+VIDEO_DIR = "tests/videos"
+test_file1 = VIDEO_DIR + "/320x240.ogg"
+test_file2 = VIDEO_DIR + "/videotestsrc-720x576-16-15.ogg"
+test_file3 = VIDEO_DIR + "/offset_test.ogv"
 
 def test_open1():
     t = Theora(test_file1)
@@ -42,3 +43,9 @@ def test_get_frame_data():
     assert Y.shape == (240, 320)
     assert Cb.shape == (120, 160)
     assert Cr.shape == (120, 160)
+
+def test_PIL_image():
+    t = Theora(test_file1)
+    t.read_frame()
+    img = t.get_frame_image()
+    img.save(VIDEO_DIR + "/a.png")
