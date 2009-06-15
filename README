@@ -1,20 +1,35 @@
+python-theora
+-------------
+
 Python wrappers for libtheora.
 
 
 Installation
 ------------
 
-Download libtheora-1.0 from: http://www.theora.org/downloads/, install and set
-the installation path in the Makefile. E.g. assuming you'll install to
-/home/ondrej/usr, do:
+Download libtheora-1.0 from: http://www.theora.org/downloads/, install into
+$PREFIX and set PKG_CONFIG_PATH to point to $PREFIX/lib/pkgconfig.
+
+E.g. assuming you'll install to ~/usr, do:
 
 wget http://downloads.xiph.org/releases/theora/libtheora-1.0.tar.bz2
 tar xjf libtheora-1.0.tar.bz2
 cd libtheora-1.0
-./configure --prefix=/home/ondrej/usr
+./configure --prefix=$HOME/usr
 make
 make install
 
 and then cd to the python-theora directory and just do:
 
-make
+export PKG_CONFIG_PATH=~/usr/lib/pkgconfig
+./setup.py install --home=~/usr
+
+
+Usage
+-----
+
+In [1]: import theora
+
+In [2]: help(theora)
+
+And read the help for the Theora class.
