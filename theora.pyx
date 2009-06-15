@@ -525,6 +525,28 @@ cdef class Theora:
     def YCbCr2RGB(self, np.ndarray[np.uint8_t, ndim=3] A):
         """
         Converts the the (w, h, 3) array from YCbCr into RGB.
+
+        Example:
+
+        >>> from theora import Theora, test_files
+        >>> t = Theora(test_files[2])
+        >>> t.read_frame()
+        True
+        >>> A = t.YCbCr_tuple2array(t.get_frame_data())
+        >>> A[:2, :2, :]
+        array([[[254, 128, 128],
+                [254, 128, 128]],
+        <BLANKLINE>
+               [[254, 128, 128],
+                [254, 128, 128]]], dtype=uint8)
+        >>> B = t.YCbCr2RGB(A)
+        >>> B[:2, :2, :]
+        array([[[255, 255, 255],
+                [255, 255, 255]],
+        <BLANKLINE>
+               [[255, 255, 255],
+                [255, 255, 255]]], dtype=uint8)
+
         """
         cdef int w, h, i, j
         cdef int Y, Cb, Cr
