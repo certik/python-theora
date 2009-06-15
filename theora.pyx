@@ -574,6 +574,27 @@ cdef class Theora:
         remember that this is the whole frame, so there might be some unused
         areas, see self._ti.pic_x/pic_y/pic_width/pic_height (padding is
         stripped though).
+
+        Use .YCbCr_tuple2array() to obtain one numpy array with rescaled Cb and
+        Cr planes and fixed offset.
+
+        Example:
+
+        >>> from theora import Theora, test_files
+        >>> t = Theora(test_files[3])
+        >>> t.read_frame()
+        True
+        >>> Y, Cb, Cr = t.get_frame_data()
+        >>> Y.shape
+        (784, 768)
+        >>> Cb.shape
+        (392, 384)
+        >>> Cr.shape
+        (392, 384)
+        >>> A = t.YCbCr_tuple2array((Y, Cb, Cr))
+        >>> A.shape
+        (512, 512, 3)
+
         """
         from numpy import zeros
         cdef th_ycbcr_buffer ycbcr
