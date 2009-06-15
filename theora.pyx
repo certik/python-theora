@@ -636,7 +636,7 @@ cdef class TheoraEncoder:
             raise Exception("Can't compress the matrix.")
         return B
 
-    def write_frame(self, A, last=False):
+    def write_frame_array(self, A, last=False):
         """
         Writes another frame to outfile.
 

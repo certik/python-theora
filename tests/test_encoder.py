@@ -11,4 +11,4 @@ def test_recoding1():
     a.seek(time=0.75)
     while a.read_frame() and a.time < 0.90:
         A = a.get_frame_array()
-        b.write_frame(A)
+        b.write_frame_array(A)
