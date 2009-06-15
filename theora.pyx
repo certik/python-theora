@@ -404,6 +404,34 @@ cdef class Theora:
         Enlarges the matrix A to fit into the (w, h) shape.
 
         Currently it can only double each dimension.
+
+        Example:
+
+        >>> from theora import Theora, test_files
+        >>> t = Theora(test_files[2])
+        >>> from numpy import array
+        >>> A = array([[1, 2], [3, 4]], dtype="uint8")
+        >>> A
+        array([[1, 2],
+               [3, 4]], dtype=uint8)
+        >>> t.fix_size(A, 2, 2)
+        array([[1, 2],
+               [3, 4]], dtype=uint8)
+        >>> t.fix_size(A, 4, 4)
+        array([[1, 1, 2, 2],
+               [1, 1, 2, 2],
+               [3, 3, 4, 4],
+               [3, 3, 4, 4]], dtype=uint8)
+        >>> t.fix_size(A, 4, 2)
+        array([[1, 2],
+               [1, 2],
+               [3, 4],
+               [3, 4]], dtype=uint8)
+        >>> t.fix_size(A, 2, 4)
+        Traceback (most recent call last):
+        ...
+        Exception: Can't enlarge the matrix.
+
         """
         cdef int i, j
         from numpy import zeros
