@@ -220,6 +220,23 @@ cdef class Theora:
 
     @property
     def frame(self):
+        """
+        Returns the current frame number.
+
+        Example:
+
+        >>> from theora import Theora, test_files
+        >>> t = Theora(test_files[2])
+        >>> t.read_frame()
+        True
+        >>> t.frame
+        1
+        >>> t.read_frame()
+        True
+        >>> t.frame
+        2
+
+        """
         return self._frame
 
     @property
