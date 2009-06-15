@@ -9,6 +9,17 @@ Welcome to python-theora's documentation!
 decoding and encoding of any theora video and provide a nice high level Python
 API to theora.
 
+web: http://certik.github.com/python-theora
+
+code: http://github.com/certik/python-theora
+
+E.g. do::
+
+  $ git clone git://github.com/certik/python-theora.git
+  $ cd python-theora
+
+and read the ``README`` for  installation instructions.
+
 It currently contains only one Python module ``theora``, whose
 thorough documentation is below:
 
