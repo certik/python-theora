@@ -705,7 +705,13 @@ cdef class Theora:
         """
         Reads headers of the theora file.
 
-        This is called from the __init__() automatically.
+        This is called from the __init__() automatically, don't call it
+        yourself. That said, it shouldn't cause any problem to call it twice:
+
+        >>> from theora import Theora, test_files
+        >>> t = Theora(test_files[1])
+        >>> t.read_headers()
+
         """
         cdef ogg_stream_state test
         stateflag = True
