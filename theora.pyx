@@ -764,6 +764,20 @@ cdef class Theora:
             raise Exception("th_decode_alloc failed: the decoding parameters are invalid")
 
     def __str__(self):
+        """
+        Returns a string representation.
+
+        Example:
+
+        >>> from theora import Theora, test_files
+        >>> t = Theora(test_files[2])
+        >>> t
+        <theora.Theora object at 0x...>
+        >>> print t
+        <Ogg logical stream 11f68f2c is Theora 720x576 25.00 fps video, encoded frame
+        content is 720x576 with 0x0 offset, aspect is 16:15>
+
+        """
         return "<Ogg logical stream %lx is Theora %dx%d %.02f fps video, " \
             "encoded frame\ncontent is %dx%d with %dx%d offset, " \
             "aspect is %d:%d>" % (
