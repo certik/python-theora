@@ -969,6 +969,18 @@ cdef class TheoraEncoder:
         th_encode_free(self._te)
 
     def __str__(self):
+        """
+        String representation of self.
+
+        Example:
+
+        >>> from theora import TheoraEncoder, VIDEO_DIR
+        >>> a = TheoraEncoder(VIDEO_DIR+"/b.ogv", 100, 100)
+        >>> print a
+        <Ogg logical stream is Theora 100x100 25.00 fps video, encoded frame
+        content is 112x112 with 0x0 offset, aspect is 0:0>
+
+        """
         return "<Ogg logical stream is Theora %dx%d %.02f fps video, " \
             "encoded frame\ncontent is %dx%d with %dx%d offset, " \
             "aspect is %d:%d>" % (
@@ -1018,6 +1030,17 @@ cdef class TheoraEncoder:
 
         last .... Set it to true for the last frame, so that the proper EOS
                   flag is set on the last packet
+
+        Example:
+
+        >>> from theora import Theora, TheoraEncoder, test_files, VIDEO_DIR
+        >>> a = Theora(test_files[1])
+        >>> b = TheoraEncoder(VIDEO_DIR+"/b.ogv", a.width, a.height)
+        >>> a.read_frame()
+        True
+        >>> A = a.get_frame_array()
+        >>> b.write_frame_array(A)
+
         """
         cdef int r
         cdef int i
