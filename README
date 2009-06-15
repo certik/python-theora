@@ -24,6 +24,14 @@ and then cd to the python-theora directory and just do:
 export PKG_CONFIG_PATH=~/usr/lib/pkgconfig
 ./setup.py install --home=~/usr
 
+Documentation
+-------------
+
+To build the documentation, use:
+
+$ ./setup.py build_ext --inplace
+$ cd doc
+$ make html
 
 Usage
 -----
