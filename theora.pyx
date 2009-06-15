@@ -876,6 +876,13 @@ def YCbCr2RGB_fast(YCbCr):
     Converts from YCbCr to RGB using a very fast C integer arithmetics.
 
     Assumes both YCbCr and RGB are between 0..255
+
+    Example:
+
+    >>> from theora import YCbCr2RGB_fast
+    >>> YCbCr2RGB_fast((100, 100, 130))
+    array([101, 107,  41], dtype=uint8)
+
     """
     from numpy import array
     cdef unsigned char R, G, B
