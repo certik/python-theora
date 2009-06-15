@@ -438,6 +438,17 @@ cdef class Theora:
     def get_frame_image(self):
         """
         Returns the frame image data as a PIL image.
+
+        Example:
+
+        >>> from theora import Theora, test_files
+        >>> t = Theora(test_files[2])
+        >>> t.read_frame()
+        True
+        >>> img = t.get_frame_image()
+        >>> img  #doctest: +ELLIPSIS
+        <Image.Image instance at 0x...>
+
         """
         from scipy.misc import toimage
         return toimage(self.YCbCr2RGB(self.get_frame_array()), channel_axis=2)
