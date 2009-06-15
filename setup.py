@@ -32,6 +32,8 @@ class test_theora(Command):
         py.test.cmdline.main(["tests/"])
         # if there was a test failure, the py.test calls sys.exit(), so the
         # code below is not executed:
+        print "\nRunning doctests:"
+        print "Testing the file 'theora.pyx'"
         print "Failed %s, tested %s" % doctest.testfile("theora.pyx", module_relative=False)
 
 
