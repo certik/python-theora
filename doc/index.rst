@@ -5,6 +5,13 @@
 Welcome to python-theora's documentation!
 =========================================
 
+``python-theora`` are Python wrappers to the ``libtheora`` library, that expose
+decoding and encoding of any theora video and provide a nice high level Python
+API to theora.
+
+It currently contains only one Python module ``theora``, whose
+thorough documentation is below:
+
 Contents:
 
 .. toctree::
