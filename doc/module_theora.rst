@@ -5,3 +5,6 @@ theora docs
 
 .. autoclass:: Theora
    :members:
+
+.. autoclass:: TheoraEncoder
+   :members:
