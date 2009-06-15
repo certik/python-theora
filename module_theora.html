@@ -1,0 +1,675 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>theora module &mdash; theora v0.1 documentation</title>
+    <link rel="stylesheet" href="static/default.css" type="text/css" />
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="static/jquery.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
+    <link rel="top" title="theora v0.1 documentation" href="index.html" />
+    <link rel="prev" title="Welcome to python-theora&#8217;s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to python-theora&#8217;s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">theora v0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  
+  <div class="section" id="module-theora">
+<h1>theora module<a class="headerlink" href="#module-theora" title="Permalink to this headline">¶</a></h1>
+<p>Currently all Python wrappers to <tt class="docutils literal"><span class="pre">libtheora</span></tt> are in this module. It consists
+of two classes: <tt class="docutils literal"><span class="pre">Theora</span></tt> (for decoding any theora file) and <tt class="docutils literal"><span class="pre">TheoraEncoder</span></tt>
+(for encoding any theora file). The whole documentation below is automatically
+generated from the docstrings and the best way to get started is to read the
+class docstring, which contains an example how to get started. Every single
+method of both classes is documented by an example of usage, so simply reading
+the docstring in <tt class="docutils literal"><span class="pre">ipython</span></tt> should be enough to understand how to use the
+method.</p>
+<div class="section" id="class-theora">
+<h2>class Theora<a class="headerlink" href="#class-theora" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="theora.Theora">
+<!--[theora.Theora]-->class <tt class="descclassname">theora.</tt><tt class="descname">Theora</tt><a class="headerlink" href="#theora.Theora" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides a nice high level Python interface to a theora video stream.</p>
+<p>It can read frames as numpy arrays or PIL images.</p>
+<p>Example of usage:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">theora</span> <span class="k">import</span> <span class="n">Theora</span><span class="p">,</span> <span class="n">test_files</span><span class="p">,</span> <span class="n">VIDEO_DIR</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">Theora</span><span class="p">(</span><span class="n">test_files</span><span class="p">[</span><span class="mf">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">t</span>
+<span class="go">&lt;Ogg logical stream 11f68f2c is Theora 720x576 25.00 fps video, encoded frame</span>
+<span class="go">content is 720x576 with 0x0 offset, aspect is 16:15&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">read_frame</span><span class="p">()</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">read_frame</span><span class="p">()</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">get_frame_data</span><span class="p">()</span>
+<span class="go">[array([[254, 254, 254, ...,  28,  28,  28],</span>
+<span class="go">       [254, 254, 254, ...,  28,  28,  28],</span>
+<span class="go">       [254, 254, 254, ...,  28,  28,  28],</span>
+<span class="go">       ..., </span>
+<span class="go">       [ 16,  16,  16, ..., 169,  97,  88],</span>
+<span class="go">       [ 16,  16,  16, ..., 125,  70, 169],</span>
+<span class="go">       [ 16,  16,  16, ...,  19,  94, 161]], dtype=uint8), array([[128, 128, 128, ..., 255, 255, 255],</span>
+<span class="go">       [128, 128, 128, ..., 255, 255, 255],</span>
+<span class="go">       [128, 128, 128, ..., 255, 255, 255],</span>
+<span class="go">       ..., </span>
+<span class="go">       [197, 197, 197, ..., 128, 128, 128],</span>
+<span class="go">       [197, 197, 197, ..., 128, 128, 128],</span>
+<span class="go">       [197, 197, 197, ..., 128, 128, 128]], dtype=uint8), array([[128, 128, 128, ..., 107, 107, 107],</span>
+<span class="go">       [128, 128, 128, ..., 107, 107, 107],</span>
+<span class="go">       [128, 128, 128, ..., 107, 107, 107],</span>
+<span class="go">       ..., </span>
+<span class="go">       [ 21,  21,  21, ..., 128, 128, 128],</span>
+<span class="go">       [ 21,  21,  21, ..., 128, 128, 128],</span>
+<span class="go">       [ 21,  21,  21, ..., 128, 128, 128]], dtype=uint8)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">img</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">get_frame_image</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">img</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">VIDEO_DIR</span><span class="o">+</span><span class="s">&quot;c.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="theora.Theora.YCbCr2RGB">
+<!--[theora.Theora.YCbCr2RGB]--><tt class="descname">YCbCr2RGB</tt><big>(</big><big>)</big><a class="headerlink" href="#theora.Theora.YCbCr2RGB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts the the (w, h, 3) array from YCbCr into RGB.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">theora</span> <span class="k">import</span> <span class="n">Theora</span><span class="p">,</span> <span class="n">test_files</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">Theora</span><span class="p">(</span><span class="n">test_files</span><span class="p">[</span><span class="mf">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">read_frame</span><span class="p">()</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">YCbCr_tuple2array</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">get_frame_data</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span><span class="p">[:</span><span class="mf">2</span><span class="p">,</span> <span class="p">:</span><span class="mf">2</span><span class="p">,</span> <span class="p">:]</span>
+<span class="go">array([[[254, 128, 128],</span>
+<span class="go">        [254, 128, 128]],</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
+<span class="go">       [[254, 128, 128],</span>
+<span class="go">        [254, 128, 128]]], dtype=uint8)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">B</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">YCbCr2RGB</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">B</span><span class="p">[:</span><span class="mf">2</span><span class="p">,</span> <span class="p">:</span><span class="mf">2</span><span class="p">,</span> <span class="p">:]</span>
+<span class="go">array([[[255, 255, 255],</span>
+<span class="go">        [255, 255, 255]],</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
+<span class="go">       [[255, 255, 255],</span>
+<span class="go">        [255, 255, 255]]], dtype=uint8)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="theora.Theora.YCbCr_tuple2array">
+<!--[theora.Theora.YCbCr_tuple2array]--><tt class="descname">YCbCr_tuple2array</tt><big>(</big><big>)</big><a class="headerlink" href="#theora.Theora.YCbCr_tuple2array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts the YCbCr tuple to one numpy (w, h, 3) array.</p>
+<p>It also implements the theora offset and also automatically rescales Cb
+and Cr if necessary (Theora encoder sometimes reduces their
+width/height twice compared to Y).</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">theora</span> <span class="k">import</span> <span class="n">Theora</span><span class="p">,</span> <span class="n">test_files</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">Theora</span><span class="p">(</span><span class="n">test_files</span><span class="p">[</span><span class="mf">3</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">read_frame</span><span class="p">()</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Y</span><span class="p">,</span> <span class="n">Cb</span><span class="p">,</span> <span class="n">Cr</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">get_frame_data</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Y</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(784, 768)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Cb</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(392, 384)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Cr</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(392, 384)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">YCbCr_tuple2array</span><span class="p">((</span><span class="n">Y</span><span class="p">,</span> <span class="n">Cb</span><span class="p">,</span> <span class="n">Cr</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(512, 512, 3)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="theora.Theora.aspect_ratio">
+<!--[theora.Theora.aspect_ratio]--><tt class="descname">aspect_ratio</tt><a class="headerlink" href="#theora.Theora.aspect_ratio" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the aspect_ratio of the video.</p>
+<p>This property can be used immediately after creating the instance.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">theora</span> <span class="k">import</span> <span class="n">Theora</span><span class="p">,</span> <span class="n">test_files</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">Theora</span><span class="p">(</span><span class="n">test_files</span><span class="p">[</span><span class="mf">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">t</span><span class="o">.</span><span class="n">width</span>
+<span class="go">720</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">t</span><span class="o">.</span><span class="n">height</span>
+<span class="go">576</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">aspect_ratio</span> <span class="o">==</span> <span class="p">(</span><span class="mf">16</span><span class="p">,</span> <span class="mf">15</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">serialno</span>
+<span class="go">301371180</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">fps_ratio</span> <span class="o">==</span> <span class="p">(</span><span class="mf">250000000</span><span class="p">,</span> <span class="mf">10000000</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="theora.Theora.fix_size">
+<!--[theora.Theora.fix_size]--><tt class="descname">fix_size</tt><big>(</big><big>)</big><a class="headerlink" href="#theora.Theora.fix_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enlarges the matrix A to fit into the (w, h) shape.</p>
+<p>Currently it can only double each dimension.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">theora</span> <span class="k">import</span> <span class="n">Theora</span><span class="p">,</span> <span class="n">test_files</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">Theora</span><span class="p">(</span><span class="n">test_files</span><span class="p">[</span><span class="mf">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">array</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span> <span class="o">=</span> <span class="n">array</span><span class="p">([[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">2</span><span class="p">],</span> <span class="p">[</span><span class="mf">3</span><span class="p">,</span> <span class="mf">4</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="s">&quot;uint8&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span>
+<span class="go">array([[1, 2],</span>
+<span class="go">       [3, 4]], dtype=uint8)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">fix_size</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">2</span><span class="p">)</span>
+<span class="go">array([[1, 2],</span>
+<span class="go">       [3, 4]], dtype=uint8)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">fix_size</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="mf">4</span><span class="p">,</span> <span class="mf">4</span><span class="p">)</span>
+<span class="go">array([[1, 1, 2, 2],</span>
+<span class="go">       [1, 1, 2, 2],</span>
+<span class="go">       [3, 3, 4, 4],</span>
+<span class="go">       [3, 3, 4, 4]], dtype=uint8)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">fix_size</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="mf">4</span><span class="p">,</span> <span class="mf">2</span><span class="p">)</span>
+<span class="go">array([[1, 2],</span>
+<span class="go">       [1, 2],</span>
+<span class="go">       [3, 4],</span>
+<span class="go">       [3, 4]], dtype=uint8)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">fix_size</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">4</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="go">Exception: Can&#39;t enlarge the matrix.</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="theora.Theora.fps_ratio">
+<!--[theora.Theora.fps_ratio]--><tt class="descname">fps_ratio</tt><a class="headerlink" href="#theora.Theora.fps_ratio" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the fps ratio of the video.</p>
+<p>If you divide the two numbers, you get the fps.</p>
+<p>This property can be used immediately after creating the instance.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">theora</span> <span class="k">import</span> <span class="n">Theora</span><span class="p">,</span> <span class="n">test_files</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">Theora</span><span class="p">(</span><span class="n">test_files</span><span class="p">[</span><span class="mf">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">t</span><span class="o">.</span><span class="n">width</span>
+<span class="go">720</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">t</span><span class="o">.</span><span class="n">height</span>
+<span class="go">576</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">aspect_ratio</span> <span class="o">==</span> <span class="p">(</span><span class="mf">16</span><span class="p">,</span> <span class="mf">15</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">serialno</span>
+<span class="go">301371180</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">fps_ratio</span> <span class="o">==</span> <span class="p">(</span><span class="mf">250000000</span><span class="p">,</span> <span class="mf">10000000</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="theora.Theora.frame">
+<!--[theora.Theora.frame]--><tt class="descname">frame</tt><a class="headerlink" href="#theora.Theora.frame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the current frame number.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">theora</span> <span class="k">import</span> <span class="n">Theora</span><span class="p">,</span> <span class="n">test_files</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">Theora</span><span class="p">(</span><span class="n">test_files</span><span class="p">[</span><span class="mf">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">read_frame</span><span class="p">()</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">frame</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">read_frame</span><span class="p">()</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">frame</span>
+<span class="go">2</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="theora.Theora.get_frame_array">
+<!--[theora.Theora.get_frame_array]--><tt class="descname">get_frame_array</tt><big>(</big><big>)</big><a class="headerlink" href="#theora.Theora.get_frame_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the frame image data as a numpy (h, w, 3) array.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">theora</span> <span class="k">import</span> <span class="n">Theora</span><span class="p">,</span> <span class="n">test_files</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">Theora</span><span class="p">(</span><span class="n">test_files</span><span class="p">[</span><span class="mf">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">read_frame</span><span class="p">()</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">get_frame_array</span><span class="p">()</span>
+<span class="go">array([[[254, 128, 128],</span>
+<span class="go">        [254, 128, 128],</span>
+<span class="go">        [254, 128, 128],</span>
+<span class="go">        ..., </span>
+<span class="go">        [ 28, 255, 107],</span>
+<span class="go">        [ 28, 255, 107],</span>
+<span class="go">        [ 28, 255, 107]],</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
+<span class="go">       [[254, 128, 128],</span>
+<span class="go">        [254, 128, 128],</span>
+<span class="go">        [254, 128, 128],</span>
+<span class="go">        ..., </span>
+<span class="go">        [ 28, 255, 107],</span>
+<span class="go">        [ 28, 255, 107],</span>
+<span class="go">        [ 28, 255, 107]],</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
+<span class="go">       [[254, 128, 128],</span>
+<span class="go">        [254, 128, 128],</span>
+<span class="go">        [254, 128, 128],</span>
+<span class="go">        ..., </span>
+<span class="go">        [ 28, 255, 107],</span>
+<span class="go">        [ 28, 255, 107],</span>
+<span class="go">        [ 28, 255, 107]],</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
+<span class="go">       ..., </span>
+<span class="go">       [[ 16, 197,  21],</span>
+<span class="go">        [ 16, 197,  21],</span>
+<span class="go">        [ 16, 197,  21],</span>
+<span class="go">        ..., </span>
+<span class="go">        [ 84, 128, 128],</span>
+<span class="go">        [ 90, 128, 128],</span>
+<span class="go">        [205, 128, 128]],</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
+<span class="go">       [[ 16, 197,  21],</span>
+<span class="go">        [ 16, 197,  21],</span>
+<span class="go">        [ 16, 197,  21],</span>
+<span class="go">        ..., </span>
+<span class="go">        [227, 128, 128],</span>
+<span class="go">        [201, 128, 128],</span>
+<span class="go">        [214, 128, 128]],</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
+<span class="go">       [[ 16, 197,  21],</span>
+<span class="go">        [ 16, 197,  21],</span>
+<span class="go">        [ 16, 197,  21],</span>
+<span class="go">        ..., </span>
+<span class="go">        [165, 128, 128],</span>
+<span class="go">        [214, 128, 128],</span>
+<span class="go">        [246, 128, 128]]], dtype=uint8)</span>
+</pre></div>
+</div>
+<p>This performs Cb and Cr components enlarging, as well as offset
+cropping.</p>
+<p>For accessing raw data, use get_frame_data().</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="theora.Theora.get_frame_data">
+<!--[theora.Theora.get_frame_data]--><tt class="descname">get_frame_data</tt><big>(</big><big>)</big><a class="headerlink" href="#theora.Theora.get_frame_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads the image data and returns a tuple (Y, Cb, Cr).</p>
+<p>This is the lowest level API. Note that Cb and Cr may have twice lower
+dimensions than Y (the higher level API takes care of that) and also
+remember that this is the whole frame, so there might be some unused
+areas, see self._ti.pic_x/pic_y/pic_width/pic_height (padding is
+stripped though).</p>
+<p>Use .YCbCr_tuple2array() to obtain one numpy array with rescaled Cb and
+Cr planes and fixed offset.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">theora</span> <span class="k">import</span> <span class="n">Theora</span><span class="p">,</span> <span class="n">test_files</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">Theora</span><span class="p">(</span><span class="n">test_files</span><span class="p">[</span><span class="mf">3</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">read_frame</span><span class="p">()</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Y</span><span class="p">,</span> <span class="n">Cb</span><span class="p">,</span> <span class="n">Cr</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">get_frame_data</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Y</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(784, 768)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Cb</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(392, 384)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Cr</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(392, 384)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">YCbCr_tuple2array</span><span class="p">((</span><span class="n">Y</span><span class="p">,</span> <span class="n">Cb</span><span class="p">,</span> <span class="n">Cr</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(512, 512, 3)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="theora.Theora.get_frame_image">
+<!--[theora.Theora.get_frame_image]--><tt class="descname">get_frame_image</tt><big>(</big><big>)</big><a class="headerlink" href="#theora.Theora.get_frame_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the frame image data as a PIL image.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">theora</span> <span class="k">import</span> <span class="n">Theora</span><span class="p">,</span> <span class="n">test_files</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">Theora</span><span class="p">(</span><span class="n">test_files</span><span class="p">[</span><span class="mf">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">read_frame</span><span class="p">()</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">img</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">get_frame_image</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">img</span>
+<span class="go">&lt;Image.Image instance at 0x...&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="theora.Theora.height">
+<!--[theora.Theora.height]--><tt class="descname">height</tt><a class="headerlink" href="#theora.Theora.height" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the height of the video.</p>
+<p>This property can be used immediately after creating the instance.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">theora</span> <span class="k">import</span> <span class="n">Theora</span><span class="p">,</span> <span class="n">test_files</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">Theora</span><span class="p">(</span><span class="n">test_files</span><span class="p">[</span><span class="mf">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">t</span><span class="o">.</span><span class="n">width</span>
+<span class="go">720</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">t</span><span class="o">.</span><span class="n">height</span>
+<span class="go">576</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">aspect_ratio</span> <span class="o">==</span> <span class="p">(</span><span class="mf">16</span><span class="p">,</span> <span class="mf">15</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">serialno</span>
+<span class="go">301371180</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">fps_ratio</span> <span class="o">==</span> <span class="p">(</span><span class="mf">250000000</span><span class="p">,</span> <span class="mf">10000000</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="theora.Theora.read_frame">
+<!--[theora.Theora.read_frame]--><tt class="descname">read_frame</tt><big>(</big><big>)</big><a class="headerlink" href="#theora.Theora.read_frame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads the next frame.</p>
+<p>Returns True if the next frame was read, otherwise False (which means
+the EOF was reached).</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">theora</span> <span class="k">import</span> <span class="n">Theora</span><span class="p">,</span> <span class="n">test_files</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">Theora</span><span class="p">(</span><span class="n">test_files</span><span class="p">[</span><span class="mf">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">read_frame</span><span class="p">()</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">read_frame</span><span class="p">()</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="theora.Theora.read_headers">
+<!--[theora.Theora.read_headers]--><tt class="descname">read_headers</tt><big>(</big><big>)</big><a class="headerlink" href="#theora.Theora.read_headers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads headers of the theora file.</p>
+<p>This is called from the __init__() automatically, don&#8217;t call it
+yourself. That said, it shouldn&#8217;t cause any problem to call it twice:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">theora</span> <span class="k">import</span> <span class="n">Theora</span><span class="p">,</span> <span class="n">test_files</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">Theora</span><span class="p">(</span><span class="n">test_files</span><span class="p">[</span><span class="mf">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">read_headers</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="theora.Theora.seek">
+<!--[theora.Theora.seek]--><tt class="descname">seek</tt><big>(</big><big>)</big><a class="headerlink" href="#theora.Theora.seek" title="Permalink to this definition">¶</a></dt>
+<dd><p>Seeks to the specified time or frame.</p>
+<p>Currently it can only seek forward.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">theora</span> <span class="k">import</span> <span class="n">Theora</span><span class="p">,</span> <span class="n">test_files</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Theora</span><span class="p">(</span><span class="n">test_files</span><span class="p">[</span><span class="mf">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>  <span class="c"># seeks to 1s</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">frame</span><span class="o">=</span><span class="mf">520</span><span class="p">)</span> <span class="c"># seeks to the frame 520</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="theora.Theora.serialno">
+<!--[theora.Theora.serialno]--><tt class="descname">serialno</tt><a class="headerlink" href="#theora.Theora.serialno" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the serial number of the video.</p>
+<p>This property can be used immediately after creating the instance.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">theora</span> <span class="k">import</span> <span class="n">Theora</span><span class="p">,</span> <span class="n">test_files</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">Theora</span><span class="p">(</span><span class="n">test_files</span><span class="p">[</span><span class="mf">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">t</span><span class="o">.</span><span class="n">width</span>
+<span class="go">720</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">t</span><span class="o">.</span><span class="n">height</span>
+<span class="go">576</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">aspect_ratio</span> <span class="o">==</span> <span class="p">(</span><span class="mf">16</span><span class="p">,</span> <span class="mf">15</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">serialno</span>
+<span class="go">301371180</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">fps_ratio</span> <span class="o">==</span> <span class="p">(</span><span class="mf">250000000</span><span class="p">,</span> <span class="mf">10000000</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="theora.Theora.time">
+<!--[theora.Theora.time]--><tt class="descname">time</tt><a class="headerlink" href="#theora.Theora.time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the current video time of the frame.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">theora</span> <span class="k">import</span> <span class="n">Theora</span><span class="p">,</span> <span class="n">test_files</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">Theora</span><span class="p">(</span><span class="n">test_files</span><span class="p">[</span><span class="mf">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">t</span><span class="o">.</span><span class="n">time</span>
+<span class="go">0.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">read_frame</span><span class="p">()</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">t</span><span class="o">.</span><span class="n">time</span>
+<span class="go">0.04</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">read_frame</span><span class="p">()</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">t</span><span class="o">.</span><span class="n">time</span>
+<span class="go">0.08</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="theora.Theora.trim_offset">
+<!--[theora.Theora.trim_offset]--><tt class="descname">trim_offset</tt><big>(</big><big>)</big><a class="headerlink" href="#theora.Theora.trim_offset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Trims the theora offset.</p>
+<p>It uses self._ti.pic_x/pic_y/pic_width/pic_height to crop the image.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">theora</span> <span class="k">import</span> <span class="n">Theora</span><span class="p">,</span> <span class="n">test_files</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">Theora</span><span class="p">(</span><span class="n">test_files</span><span class="p">[</span><span class="mf">3</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">t</span><span class="o">.</span><span class="n">width</span>
+<span class="go">512</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">t</span><span class="o">.</span><span class="n">height</span>
+<span class="go">512</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">read_frame</span><span class="p">()</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Y</span><span class="p">,</span> <span class="n">Cb</span><span class="p">,</span> <span class="n">Cr</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">get_frame_data</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Y</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(784, 768)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Y_trimmed</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">trim_offset</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Y_trimmed</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(512, 512)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="theora.Theora.width">
+<!--[theora.Theora.width]--><tt class="descname">width</tt><a class="headerlink" href="#theora.Theora.width" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the width of the video.</p>
+<p>This property can be used immediately after creating the instance.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">theora</span> <span class="k">import</span> <span class="n">Theora</span><span class="p">,</span> <span class="n">test_files</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">Theora</span><span class="p">(</span><span class="n">test_files</span><span class="p">[</span><span class="mf">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">t</span><span class="o">.</span><span class="n">width</span>
+<span class="go">720</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">t</span><span class="o">.</span><span class="n">height</span>
+<span class="go">576</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">aspect_ratio</span> <span class="o">==</span> <span class="p">(</span><span class="mf">16</span><span class="p">,</span> <span class="mf">15</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">serialno</span>
+<span class="go">301371180</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">fps_ratio</span> <span class="o">==</span> <span class="p">(</span><span class="mf">250000000</span><span class="p">,</span> <span class="mf">10000000</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="class-theoraencoder">
+<h2>class TheoraEncoder<a class="headerlink" href="#class-theoraencoder" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="theora.TheoraEncoder">
+<!--[theora.TheoraEncoder]-->class <tt class="descclassname">theora.</tt><tt class="descname">TheoraEncoder</tt><a class="headerlink" href="#theora.TheoraEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class to encode a Theora video.</p>
+<p>Example of usage:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">theora</span> <span class="k">import</span> <span class="n">Theora</span><span class="p">,</span> <span class="n">TheoraEncoder</span><span class="p">,</span> <span class="n">test_files</span><span class="p">,</span> <span class="n">VIDEO_DIR</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Theora</span><span class="p">(</span><span class="n">test_files</span><span class="p">[</span><span class="mf">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">TheoraEncoder</span><span class="p">(</span><span class="n">VIDEO_DIR</span><span class="o">+</span><span class="s">&quot;/b.ogv&quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="mf">0.75</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">while</span> <span class="n">a</span><span class="o">.</span><span class="n">read_frame</span><span class="p">()</span> <span class="ow">and</span> <span class="n">a</span><span class="o">.</span><span class="n">time</span> <span class="o">&lt;</span> <span class="mf">0.90</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">A</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">get_frame_array</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">b</span><span class="o">.</span><span class="n">write_frame_array</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="gp">... </span>
+<span class="gp">&gt;&gt;&gt; </span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="theora.TheoraEncoder.fix_size">
+<!--[theora.TheoraEncoder.fix_size]--><tt class="descname">fix_size</tt><big>(</big><big>)</big><a class="headerlink" href="#theora.TheoraEncoder.fix_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compresses the matrix A to fit into the (w, h) shape.</p>
+<p>Currently it can only half each dimension.</p>
+<p>Examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">theora</span> <span class="k">import</span> <span class="n">TheoraEncoder</span><span class="p">,</span> <span class="n">VIDEO_DIR</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">TheoraEncoder</span><span class="p">(</span><span class="n">VIDEO_DIR</span><span class="o">+</span><span class="s">&quot;/b.ogv&quot;</span><span class="p">,</span> <span class="mf">100</span><span class="p">,</span> <span class="mf">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">array</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span> <span class="o">=</span> <span class="n">array</span><span class="p">([[</span><span class="mf">1</span><span class="p">,</span> <span class="mf">2</span><span class="p">],</span> <span class="p">[</span><span class="mf">3</span><span class="p">,</span> <span class="mf">4</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="s">&quot;uint8&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span>
+<span class="go">array([[1, 2],</span>
+<span class="go">       [3, 4]], dtype=uint8)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">fix_size</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">2</span><span class="p">)</span>
+<span class="go">array([[1, 2],</span>
+<span class="go">       [3, 4]], dtype=uint8)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">fix_size</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">1</span><span class="p">)</span>
+<span class="go">array([[1, 2]], dtype=uint8)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">fix_size</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">1</span><span class="p">)</span>
+<span class="go">array([[1]], dtype=uint8)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">fix_size</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="mf">1</span><span class="p">,</span> <span class="mf">2</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="go">Exception: Can&#39;t compress the matrix.</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="theora.TheoraEncoder.flush">
+<!--[theora.TheoraEncoder.flush]--><tt class="descname">flush</tt><big>(</big><big>)</big><a class="headerlink" href="#theora.TheoraEncoder.flush" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flushes any remaining data to the outfile.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">theora</span> <span class="k">import</span> <span class="n">Theora</span><span class="p">,</span> <span class="n">TheoraEncoder</span><span class="p">,</span> <span class="n">test_files</span><span class="p">,</span> <span class="n">VIDEO_DIR</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Theora</span><span class="p">(</span><span class="n">test_files</span><span class="p">[</span><span class="mf">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">TheoraEncoder</span><span class="p">(</span><span class="n">VIDEO_DIR</span><span class="o">+</span><span class="s">&quot;/b.ogv&quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">read_frame</span><span class="p">()</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">get_frame_array</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">write_frame_array</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="theora.TheoraEncoder.write_frame_array">
+<!--[theora.TheoraEncoder.write_frame_array]--><tt class="descname">write_frame_array</tt><big>(</big><big>)</big><a class="headerlink" href="#theora.TheoraEncoder.write_frame_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes another frame to outfile.</p>
+<dl class="docutils">
+<dt>last .... Set it to true for the last frame, so that the proper EOS</dt>
+<dd>flag is set on the last packet</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">theora</span> <span class="k">import</span> <span class="n">Theora</span><span class="p">,</span> <span class="n">TheoraEncoder</span><span class="p">,</span> <span class="n">test_files</span><span class="p">,</span> <span class="n">VIDEO_DIR</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Theora</span><span class="p">(</span><span class="n">test_files</span><span class="p">[</span><span class="mf">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">TheoraEncoder</span><span class="p">(</span><span class="n">VIDEO_DIR</span><span class="o">+</span><span class="s">&quot;/b.ogv&quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">read_frame</span><span class="p">()</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">get_frame_array</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">write_frame_array</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="theora.TheoraEncoder.write_frame_data">
+<!--[theora.TheoraEncoder.write_frame_data]--><tt class="descname">write_frame_data</tt><big>(</big><big>)</big><a class="headerlink" href="#theora.TheoraEncoder.write_frame_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes another frame to outfile.</p>
+<dl class="docutils">
+<dt>last .... Set it to true for the last frame, so that the proper EOS</dt>
+<dd>flag is set on the last packet</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">theora</span> <span class="k">import</span> <span class="n">Theora</span><span class="p">,</span> <span class="n">TheoraEncoder</span><span class="p">,</span> <span class="n">test_files</span><span class="p">,</span> <span class="n">VIDEO_DIR</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Theora</span><span class="p">(</span><span class="n">test_files</span><span class="p">[</span><span class="mf">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">TheoraEncoder</span><span class="p">(</span><span class="n">VIDEO_DIR</span><span class="o">+</span><span class="s">&quot;/b.ogv&quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">read_frame</span><span class="p">()</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">get_frame_data</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">write_frame_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="theora.TheoraEncoder.write_headers">
+<!--[theora.TheoraEncoder.write_headers]--><tt class="descname">write_headers</tt><big>(</big><big>)</big><a class="headerlink" href="#theora.TheoraEncoder.write_headers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes the headers, this is called from __init__() automatically.</p>
+<p>Don&#8217;t call this yourself. It should not cause any problems though:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">theora</span> <span class="k">import</span> <span class="n">TheoraEncoder</span><span class="p">,</span> <span class="n">VIDEO_DIR</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">TheoraEncoder</span><span class="p">(</span><span class="n">VIDEO_DIR</span><span class="o">+</span><span class="s">&quot;/b.ogv&quot;</span><span class="p">,</span> <span class="mf">100</span><span class="p">,</span> <span class="mf">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">write_headers</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">theora module</a><ul>
+<li><a class="reference external" href="#class-theora">class Theora</a></li>
+<li><a class="reference external" href="#class-theoraencoder">class TheoraEncoder</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="index.html" title="previous chapter">Welcome to python-theora&#8217;s documentation!</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="sources/module_theora.txt">Show Source</a></li>
+            </ul>
+          <h3>Quick search</h3>
+            <form class="search" action="search.html" method="get">
+              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to python-theora&#8217;s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">theora v0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009, Ondrej Certik and contributors.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.2.
+    </div>
+  </body>
+</html>
