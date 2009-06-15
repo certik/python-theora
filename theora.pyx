@@ -234,6 +234,10 @@ cdef class Theora:
     def height(self):
         return self._ti.pic_height
 
+    @property
+    def aspect_ratio(self):
+        return self._ti.aspect_numerator, self._ti.aspect_denominator
+
     cdef int buffer_data(self, int n=4096):
         """
         Reads "n" bytes from self._infile into the ogg_sync_state "oy".

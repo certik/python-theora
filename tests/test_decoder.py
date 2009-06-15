@@ -8,16 +8,19 @@ def test_open1():
     t = Theora(test_file1)
     assert t.width == 320
     assert t.height == 240
+    assert t.aspect_ratio == (0, 0)
 
 def test_open2():
     t = Theora(test_file2)
     assert t.width == 720
     assert t.height == 576
+    assert t.aspect_ratio == (16, 15)
 
 def test_open3():
     t = Theora(test_file3)
     assert t.width == 512
     assert t.height == 512
+    assert t.aspect_ratio == (0, 0)
 
 def test_read_frame():
     t = Theora(test_file1)
