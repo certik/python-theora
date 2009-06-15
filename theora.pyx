@@ -931,16 +931,11 @@ cdef class TheoraEncoder:
 
     """
     cdef object _outfile
-    #cdef ogg_sync_state _oy
-    #cdef th_comment _tc
     cdef th_info _ti
     cdef th_enc_ctx *_te
     cdef ogg_page _og
     cdef ogg_stream_state _os
     cdef ogg_packet _op
-    #cdef th_setup_info *_setup
-    #cdef int _frame
-    #cdef double _time
 
     def __init__(self, f, width, height, bitrate=None, quality=None):
         if isinstance(f, (str, unicode)):
