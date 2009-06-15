@@ -1,12 +1,39 @@
 #! /usr/bin/env python
 
-from distutils.core import setup
+from distutils.core import setup, Command
 from distutils.extension import Extension
 from Cython.Distutils import build_ext
 import os
 import sys
 
 __version__ = '0.1'
+
+class test_theora(Command):
+    """
+    Runs all tests under tests/ and all doctests.
+    """
+
+    description = "Runs all tests under tests/ and all doctests."
+    user_options = []
+
+    def __init__(self, *args):
+        self.args = args[0]
+        Command.__init__(self, *args)
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        import py
+        import doctest
+        py.test.cmdline.main(["tests/"])
+        # if there was a test failure, the py.test calls sys.exit(), so the
+        # code below is not executed:
+        print "Failed %s, tested %s" % doctest.testfile("theora.pyx", module_relative=False)
+
 
 # write default shout.pc path into environment if PKG_CONFIG_PATH is unset
 if not os.environ.has_key('PKG_CONFIG_PATH'):
@@ -46,7 +73,10 @@ theora = Extension('theora', sources = ['theora.pyx'],
 setup(
     name = 'theora',
     version = __version__,
-    cmdclass = {'build_ext': build_ext},
+    cmdclass = {
+        'build_ext': build_ext,
+        'test': test_theora,
+        },
     ext_modules = [theora],
     description = 'Bindings for libtheora',
     url = 'http://github.com/certik/python-theora',

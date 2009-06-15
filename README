@@ -47,4 +47,6 @@ $ ./setup.py build_ext --inplace
 
 Run tests:
 
-$ py.test tests
+$ ./setup.py test
+
+This runs all regular tests in the test directory and all doctests

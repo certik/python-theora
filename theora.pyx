@@ -492,9 +492,11 @@ cdef class Theora:
         Currently it can only seek forward.
 
         Example:
-        >>> a = Theora("tw.ogv")
+        >>> from theora import Theora, test_files
+        >>> a = Theora(test_files[1])
         >>> a.seek(1)  # seeks to 1s
-        >>> a.seek(frame = 520) # seeks to the frame 520
+        >>> a.seek(frame=520) # seeks to the frame 520
+
         """
         if time is not None:
             while self.read_frame() and self.time < time:
