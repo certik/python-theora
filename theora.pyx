@@ -197,6 +197,14 @@ cdef class Theora:
 
         f .... either the filename or an open stream, that supports the .read()
                method
+
+        Example:
+
+        >>> from theora import Theora, test_files
+        >>> t = Theora(test_files[2])
+        >>> t.read_frame()
+        True
+
         """
         if isinstance(f, (str, unicode)):
             self._infile = open(f)
