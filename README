@@ -3,6 +3,7 @@ python-theora
 
 Python wrappers for libtheora.
 
+webpage: http://certik.github.com/python-theora
 
 Installation
 ------------
