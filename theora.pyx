@@ -451,33 +451,6 @@ cdef class Theora:
             raise Exception("Can't enlarge the matrix.")
         return B
 
-    def trim_offset(self, np.ndarray[np.uint8_t, ndim=2] A):
-        """
-        Trims the theora offset.
-
-        It uses self._ti.pic_x/pic_y/pic_width/pic_height to crop the image.
-
-        Example:
-
-        >>> from theora import Theora, test_files
-        >>> t = Theora(test_files[3])
-        >>> print t.width
-        512
-        >>> print t.height
-        512
-        >>> t.read_frame()
-        True
-        >>> Y, Cb, Cr = t.get_frame_data()
-        >>> Y.shape
-        (784, 768)
-        >>> Y_trimmed = t.trim_offset(Y)
-        >>> Y_trimmed.shape
-        (512, 512)
-
-        """
-        return A[self._ti.pic_y:self._ti.pic_y+self._ti.pic_height,
-                self._ti.pic_x:self._ti.pic_x+self._ti.pic_width]
-
     def YCbCr_tuple2array(self, YCbCr):
         """
         Converts the YCbCr tuple to one numpy (w, h, 3) array.
@@ -494,11 +467,11 @@ cdef class Theora:
         True
         >>> Y, Cb, Cr = t.get_frame_data()
         >>> Y.shape
-        (784, 768)
+        (512, 512)
         >>> Cb.shape
-        (392, 384)
+        (256, 256)
         >>> Cr.shape
-        (392, 384)
+        (256, 256)
         >>> A = t.YCbCr_tuple2array((Y, Cb, Cr))
         >>> A.shape
         (512, 512, 3)
@@ -510,11 +483,6 @@ cdef class Theora:
         # enlarge Cb and Cr if necessary:
         Cb = self.fix_size(Cb, w, h)
         Cr = self.fix_size(Cr, w, h)
-        # implement the theora offset:
-        Y = self.trim_offset(Y)
-        Cb = self.trim_offset(Cb)
-        Cr = self.trim_offset(Cr)
-        w, h = Y.shape
         Y = Y.reshape((w, h, 1))
         Cb = Cb.reshape((w, h, 1))
         Cr = Cr.reshape((w, h, 1))
@@ -568,14 +536,14 @@ cdef class Theora:
         """
         Reads the image data and returns a tuple (Y, Cb, Cr).
 
-        This is the lowest level API. Note that Cb and Cr may have twice lower
-        dimensions than Y (the higher level API takes care of that) and also
-        remember that this is the whole frame, so there might be some unused
-        areas, see self._ti.pic_x/pic_y/pic_width/pic_height (padding is
-        stripped though).
+        This is the lowest level API. It takes care of theora stride and
+        offsets, so the returned YCbCr tuple is just the image.
+
+        Note however that Cb and Cr may have twice lower dimensions than Y (the
+        higher level API takes care of that) depending on the pixel format.
 
         Use .YCbCr_tuple2array() to obtain one numpy array with rescaled Cb and
-        Cr planes and fixed offset.
+        Cr planes.
 
         Example:
 
@@ -585,11 +553,11 @@ cdef class Theora:
         True
         >>> Y, Cb, Cr = t.get_frame_data()
         >>> Y.shape
-        (784, 768)
+        (512, 512)
         >>> Cb.shape
-        (392, 384)
+        (256, 256)
         >>> Cr.shape
-        (392, 384)
+        (256, 256)
         >>> A = t.YCbCr_tuple2array((Y, Cb, Cr))
         >>> A.shape
         (512, 512, 3)
@@ -600,6 +568,7 @@ cdef class Theora:
         if th_decode_ycbcr_out(self._td, ycbcr) != 0:
             raise Exception("th_decode_ycbcr_out failed\n")
         cdef int n
+        cdef int x1, y1, x2, y2
         cdef ndarray Y
         cdef char *Yp
         r = []
@@ -611,6 +580,18 @@ cdef class Theora:
             Y = Y.reshape((ycbcr[i].height, ycbcr[i].stride))
             # strip the padding:
             Y = Y[:, :ycbcr[i].width]
+            # trim the offset
+            if i == 0:
+                x1 = self._ti.pic_x
+                y1 = self._ti.pic_y
+                x2 = self._ti.pic_x + self._ti.pic_width
+                y2 = self._ti.pic_y + self._ti.pic_height
+            else:
+                x1 = self._ti.pic_x // 2
+                y1 = self._ti.pic_y // 2
+                x2 = (self._ti.pic_x + self._ti.pic_width) // 2
+                y2 = (self._ti.pic_y + self._ti.pic_height) // 2
+            Y = Y[y1:y2, x1:x2]
             r.append(Y)
         return r
 
