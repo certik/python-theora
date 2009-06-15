@@ -295,18 +295,96 @@ cdef class Theora:
 
     @property
     def height(self):
+        """
+        Returns the height of the video.
+
+        This property can be used immediately after creating the instance.
+
+        Example:
+
+        >>> from theora import Theora, test_files
+        >>> t = Theora(test_files[2])
+        >>> print t.width
+        720
+        >>> print t.height
+        576
+        >>> assert t.aspect_ratio == (16, 15)
+        >>> t.serialno
+        301371180
+        >>> assert t.fps_ratio == (250000000, 10000000)
+
+        """
         return self._ti.pic_height
 
     @property
     def aspect_ratio(self):
+        """
+        Returns the aspect_ratio of the video.
+
+        This property can be used immediately after creating the instance.
+
+        Example:
+
+        >>> from theora import Theora, test_files
+        >>> t = Theora(test_files[2])
+        >>> print t.width
+        720
+        >>> print t.height
+        576
+        >>> assert t.aspect_ratio == (16, 15)
+        >>> t.serialno
+        301371180
+        >>> assert t.fps_ratio == (250000000, 10000000)
+
+        """
         return self._ti.aspect_numerator, self._ti.aspect_denominator
 
     @property
     def serialno(self):
+        """
+        Returns the serial number of the video.
+
+        This property can be used immediately after creating the instance.
+
+        Example:
+
+        >>> from theora import Theora, test_files
+        >>> t = Theora(test_files[2])
+        >>> print t.width
+        720
+        >>> print t.height
+        576
+        >>> assert t.aspect_ratio == (16, 15)
+        >>> t.serialno
+        301371180
+        >>> assert t.fps_ratio == (250000000, 10000000)
+
+        """
         return self._to.serialno
 
     @property
     def fps_ratio(self):
+        """
+        Returns the fps ratio of the video.
+
+        If you divide the two numbers, you get the fps.
+
+        This property can be used immediately after creating the instance.
+
+        Example:
+
+        >>> from theora import Theora, test_files
+        >>> t = Theora(test_files[2])
+        >>> print t.width
+        720
+        >>> print t.height
+        576
+        >>> assert t.aspect_ratio == (16, 15)
+        >>> t.serialno
+        301371180
+        >>> assert t.fps_ratio == (250000000, 10000000)
+
+        """
         return self._ti.fps_numerator, self._ti.fps_denominator
 
     cdef int buffer_data(self, int n=4096):
