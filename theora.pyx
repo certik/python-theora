@@ -902,6 +902,11 @@ err_messages = {
         }
 
 def th_check(int r, char *function):
+    """
+    Raises the correct exception if r < 0.
+
+    This is used to automatically check th_* commands.
+    """
     if r < 0:
         if r in err_messages:
             raise TheoraException("%s: %s" % (function, err_messages[r]))
@@ -909,6 +914,22 @@ def th_check(int r, char *function):
             raise TheoraException("%s returned: %d" % (function, r))
 
 cdef class TheoraEncoder:
+    """
+    Class to encode a Theora video.
+
+    Example of usage:
+
+    >>> from theora import Theora, TheoraEncoder, test_files, VIDEO_DIR
+    >>> a = Theora(test_files[1])
+    >>> b = TheoraEncoder(VIDEO_DIR+"/b.ogv", a.width, a.height)
+    >>> a.seek(time=0.75)
+    >>> while a.read_frame() and a.time < 0.90:
+    ...     A = a.get_frame_array()
+    ...     b.write_frame_array(A)
+    ... 
+    >>> 
+
+    """
     cdef object _outfile
     #cdef ogg_sync_state _oy
     #cdef th_comment _tc
