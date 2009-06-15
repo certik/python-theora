@@ -1014,6 +1014,28 @@ cdef class TheoraEncoder:
         Compresses the matrix A to fit into the (w, h) shape.
 
         Currently it can only half each dimension.
+
+        Examples:
+
+        >>> from theora import TheoraEncoder, VIDEO_DIR
+        >>> t = TheoraEncoder(VIDEO_DIR+"/b.ogv", 100, 100)
+        >>> from numpy import array
+        >>> A = array([[1, 2], [3, 4]], dtype="uint8")
+        >>> A
+        array([[1, 2],
+               [3, 4]], dtype=uint8)
+        >>> t.fix_size(A, 2, 2)
+        array([[1, 2],
+               [3, 4]], dtype=uint8)
+        >>> t.fix_size(A, 2, 1)
+        array([[1, 2]], dtype=uint8)
+        >>> t.fix_size(A, 1, 1)
+        array([[1]], dtype=uint8)
+        >>> t.fix_size(A, 1, 2)
+        Traceback (most recent call last):
+        ...
+        Exception: Can't compress the matrix.
+
         """
         cdef int i, j
         from numpy import zeros
