@@ -24,8 +24,12 @@ def convert(infile, outfile, start, end):
         A = a.get_frame_array()
         b.write_frame_array(A)
 
+usage = """\
+%prog [options] file_in
+Extract the part of a Theora video file between start and/or end times.
+"""
 def main():
-    parser = OptionParser(usage="Extract the part of a Theora video file between start and/or end times.")
+    parser = OptionParser(usage=usage)
     parser.add_option("-o", "--output", dest="filename",
             help="Specify output filename")
     parser.add_option("-s", "--start", dest="start_time", type="int",
