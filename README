@@ -37,6 +37,12 @@ And read the help for the Theora class.
 Development
 -----------
 
+Rule: every single method, property and class exposed to the user (e.g. the
+"def" ones in Cython, not the "cdef" ones) *must* have a docstring and at least
+one doctest showing the usage to the user. More thorough regression testing is
+then done using regular tests in the tests directory. Of course all tests and
+all doctests must pass all the time, see below how to run tests:
+
 Download test video files:
 
 $ tests/download_test_vidos.sh
@@ -49,4 +55,4 @@ Run tests:
 
 $ ./setup.py test
 
-This runs all regular tests in the test directory and all doctests
+This runs all regular tests in the test directory and all doctests.
