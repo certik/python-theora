@@ -33,3 +33,18 @@ In [1]: import theora
 In [2]: help(theora)
 
 And read the help for the Theora class.
+
+Development
+-----------
+
+Download test video files:
+
+$ tests/download_test_vidos.sh
+
+Compile inplace:
+
+$ ./setup.py build_ext --inplace
+
+Run tests:
+
+$ py.test tests
