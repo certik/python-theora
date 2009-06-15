@@ -1074,41 +1074,11 @@ cdef class TheoraEncoder:
         >>> b.write_frame_array(A)
 
         """
-        cdef int r
-        cdef int i
-        cdef th_ycbcr_buffer ycbcr
-        cdef ndarray B
-        cdef int n
-        h, w, n = A.shape
-        n2 = w*h
-
-        L = []
-        for i in range(3):
-            if i == 0:
-                ycbcr[i].width = self._ti.frame_width
-                ycbcr[i].height = self._ti.frame_height
-                ycbcr[i].stride = w
-                L.append(A[:, :, i].reshape(n2).copy())
-            else:
-                ycbcr[i].width = self._ti.frame_width // 2
-                ycbcr[i].height = self._ti.frame_height // 2
-                ycbcr[i].stride = w // 2
-                B = self.fix_size(A[:, :, i], w//2, h//2)
-                n = n2//4
-                L.append(B.reshape(n).copy())
-            B = L[i]
-            ycbcr[i].data = <unsigned char*>(B.data)
-        r = th_encode_ycbcr_in(self._te, ycbcr)
-        th_check(r, "th_encode_ycbcr_in")
-
-        while self.th_encode_packetout(last):
-            self.ogg_stream_packetin()
-            if self.ogg_stream_pageout():
-                self.write_buffer()
-
-        # I think this is not necessary:
-        if last:
-            self.flush()
+        Y = A[:, :, 0]
+        h, w = Y.shape
+        Cb = self.fix_size(A[:, :, 1], w // 2, h // 2)
+        Cr = self.fix_size(A[:, :, 2], w // 2, h // 2)
+        self.write_frame_data((Y, Cb, Cr), last)
 
     def write_frame_data(self, data, last=False):
         """
