@@ -10,8 +10,8 @@ def test_recoding1():
 
 def test_recoding2():
     a = Theora(test_files[1])
-    b = TheoraEncoder(VIDEO_DIR+"/a.ogv", a.width, a.height)
+    b = TheoraEncoder(VIDEO_DIR+"/b.ogv", a.width, a.height)
     a.seek(time=0.75)
     while a.read_frame() and a.time < 0.90:
-        A = a.get_frame_array()
-        b.write_frame_array(A)
+        data = a.get_frame_data()
+        b.write_frame_data(data)

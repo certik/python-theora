@@ -1110,6 +1110,56 @@ cdef class TheoraEncoder:
         if last:
             self.flush()
 
+    def write_frame_data(self, data, last=False):
+        """
+        Writes another frame to outfile.
+
+        last .... Set it to true for the last frame, so that the proper EOS
+                  flag is set on the last packet
+
+        Example:
+
+        >>> from theora import Theora, TheoraEncoder, test_files, VIDEO_DIR
+        >>> a = Theora(test_files[1])
+        >>> b = TheoraEncoder(VIDEO_DIR+"/b.ogv", a.width, a.height)
+        >>> a.read_frame()
+        True
+        >>> data = a.get_frame_data()
+        >>> b.write_frame_data(data)
+
+        """
+        cdef int r
+        cdef int i
+        cdef th_ycbcr_buffer ycbcr
+        cdef ndarray B
+        cdef int n, w, h
+        L = []
+        for i in range(3):
+            A = data[i]
+            h, w = A.shape
+            n = w*h
+            if i == 0:
+                ycbcr[i].width = self._ti.frame_width
+                ycbcr[i].height = self._ti.frame_height
+            else:
+                ycbcr[i].width = self._ti.frame_width // 2
+                ycbcr[i].height = self._ti.frame_height // 2
+            ycbcr[i].stride = w
+            L.append(A.reshape(n).copy())
+            B = L[i]
+            ycbcr[i].data = <unsigned char*>(B.data)
+        r = th_encode_ycbcr_in(self._te, ycbcr)
+        th_check(r, "th_encode_ycbcr_in")
+
+        while self.th_encode_packetout(last):
+            self.ogg_stream_packetin()
+            if self.ogg_stream_pageout():
+                self.write_buffer()
+
+        # I think this is not necessary:
+        if last:
+            self.flush()
+
     def flush(self):
         """
         Flushes any remaining data to the outfile.
