@@ -249,6 +249,25 @@ cdef class Theora:
 
     @property
     def time(self):
+        """
+        Returns the current video time of the frame.
+
+        Example:
+
+        >>> from theora import Theora, test_files
+        >>> t = Theora(test_files[2])
+        >>> print t.time
+        0.0
+        >>> t.read_frame()
+        True
+        >>> print t.time
+        0.04
+        >>> t.read_frame()
+        True
+        >>> print t.time
+        0.08
+
+        """
         return self._time
 
     @property
