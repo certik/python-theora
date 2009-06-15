@@ -34,7 +34,8 @@ class test_theora(Command):
         # code below is not executed:
         print "\nRunning doctests:"
         print "Testing the file 'theora.pyx'"
-        print "Failed %s, tested %s" % doctest.testfile("theora.pyx", module_relative=False)
+        print "Failed %s, tested %s" % doctest.testfile("theora.pyx",
+                module_relative=False, optionflags=doctest.ELLIPSIS)
 
 
 # write default shout.pc path into environment if PKG_CONFIG_PATH is unset

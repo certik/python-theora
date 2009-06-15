@@ -446,7 +446,7 @@ cdef class Theora:
         >>> t.read_frame()
         True
         >>> img = t.get_frame_image()
-        >>> img  #doctest: +ELLIPSIS
+        >>> img
         <Image.Image instance at 0x...>
 
         """
