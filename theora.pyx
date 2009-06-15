@@ -238,6 +238,10 @@ cdef class Theora:
     def aspect_ratio(self):
         return self._ti.aspect_numerator, self._ti.aspect_denominator
 
+    @property
+    def fps_ratio(self):
+        return self._ti.fps_numerator, self._ti.fps_denominator
+
     cdef int buffer_data(self, int n=4096):
         """
         Reads "n" bytes from self._infile into the ogg_sync_state "oy".
