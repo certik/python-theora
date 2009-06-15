@@ -457,6 +457,24 @@ cdef class Theora:
         Trims the theora offset.
 
         It uses self._ti.pic_x/pic_y/pic_width/pic_height to crop the image.
+
+        Example:
+
+        >>> from theora import Theora, test_files
+        >>> t = Theora(test_files[3])
+        >>> print t.width
+        512
+        >>> print t.height
+        512
+        >>> t.read_frame()
+        True
+        >>> Y, Cb, Cr = t.get_frame_data()
+        >>> Y.shape
+        (784, 768)
+        >>> Y_trimmed = t.trim_offset(Y)
+        >>> Y_trimmed.shape
+        (512, 512)
+
         """
         return A[self._ti.pic_y:self._ti.pic_y+self._ti.pic_height,
                 self._ti.pic_x:self._ti.pic_x+self._ti.pic_width]
