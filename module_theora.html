@@ -134,11 +134,11 @@ width/height twice compared to Y).</p>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Y</span><span class="p">,</span> <span class="n">Cb</span><span class="p">,</span> <span class="n">Cr</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">get_frame_data</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Y</span><span class="o">.</span><span class="n">shape</span>
-<span class="go">(784, 768)</span>
+<span class="go">(512, 512)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Cb</span><span class="o">.</span><span class="n">shape</span>
-<span class="go">(392, 384)</span>
+<span class="go">(256, 256)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Cr</span><span class="o">.</span><span class="n">shape</span>
-<span class="go">(392, 384)</span>
+<span class="go">(256, 256)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">A</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">YCbCr_tuple2array</span><span class="p">((</span><span class="n">Y</span><span class="p">,</span> <span class="n">Cb</span><span class="p">,</span> <span class="n">Cr</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">A</span><span class="o">.</span><span class="n">shape</span>
 <span class="go">(512, 512, 3)</span>
@@ -308,13 +308,12 @@ cropping.</p>
 <dt id="theora.Theora.get_frame_data">
 <!--[theora.Theora.get_frame_data]--><tt class="descname">get_frame_data</tt><big>(</big><big>)</big><a class="headerlink" href="#theora.Theora.get_frame_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads the image data and returns a tuple (Y, Cb, Cr).</p>
-<p>This is the lowest level API. Note that Cb and Cr may have twice lower
-dimensions than Y (the higher level API takes care of that) and also
-remember that this is the whole frame, so there might be some unused
-areas, see self._ti.pic_x/pic_y/pic_width/pic_height (padding is
-stripped though).</p>
+<p>This is the lowest level API. It takes care of theora stride and
+offsets, so the returned YCbCr tuple is just the image.</p>
+<p>Note however that Cb and Cr may have twice lower dimensions than Y (the
+higher level API takes care of that) depending on the pixel format.</p>
 <p>Use .YCbCr_tuple2array() to obtain one numpy array with rescaled Cb and
-Cr planes and fixed offset.</p>
+Cr planes.</p>
 <p>Example:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">theora</span> <span class="k">import</span> <span class="n">Theora</span><span class="p">,</span> <span class="n">test_files</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">Theora</span><span class="p">(</span><span class="n">test_files</span><span class="p">[</span><span class="mf">3</span><span class="p">])</span>
@@ -322,11 +321,11 @@ Cr planes and fixed offset.</p>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Y</span><span class="p">,</span> <span class="n">Cb</span><span class="p">,</span> <span class="n">Cr</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">get_frame_data</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Y</span><span class="o">.</span><span class="n">shape</span>
-<span class="go">(784, 768)</span>
+<span class="go">(512, 512)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Cb</span><span class="o">.</span><span class="n">shape</span>
-<span class="go">(392, 384)</span>
+<span class="go">(256, 256)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Cr</span><span class="o">.</span><span class="n">shape</span>
-<span class="go">(392, 384)</span>
+<span class="go">(256, 256)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">A</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">YCbCr_tuple2array</span><span class="p">((</span><span class="n">Y</span><span class="p">,</span> <span class="n">Cb</span><span class="p">,</span> <span class="n">Cr</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">A</span><span class="o">.</span><span class="n">shape</span>
 <span class="go">(512, 512, 3)</span>
@@ -451,30 +450,6 @@ yourself. That said, it shouldn&#8217;t cause any problem to call it twice:</p>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">t</span><span class="o">.</span><span class="n">time</span>
 <span class="go">0.08</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="method">
-<dt id="theora.Theora.trim_offset">
-<!--[theora.Theora.trim_offset]--><tt class="descname">trim_offset</tt><big>(</big><big>)</big><a class="headerlink" href="#theora.Theora.trim_offset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Trims the theora offset.</p>
-<p>It uses self._ti.pic_x/pic_y/pic_width/pic_height to crop the image.</p>
-<p>Example:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">theora</span> <span class="k">import</span> <span class="n">Theora</span><span class="p">,</span> <span class="n">test_files</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">Theora</span><span class="p">(</span><span class="n">test_files</span><span class="p">[</span><span class="mf">3</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">t</span><span class="o">.</span><span class="n">width</span>
-<span class="go">512</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">t</span><span class="o">.</span><span class="n">height</span>
-<span class="go">512</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">read_frame</span><span class="p">()</span>
-<span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Y</span><span class="p">,</span> <span class="n">Cb</span><span class="p">,</span> <span class="n">Cr</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">get_frame_data</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Y</span><span class="o">.</span><span class="n">shape</span>
-<span class="go">(784, 768)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Y_trimmed</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">trim_offset</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Y_trimmed</span><span class="o">.</span><span class="n">shape</span>
-<span class="go">(512, 512)</span>
 </pre></div>
 </div>
 </dd></dl>

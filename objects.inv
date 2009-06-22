@@ -12,7 +12,6 @@ theora.Theora.YCbCr2RGB method module_theora.html
 theora.Theora.seek method module_theora.html
 theora.TheoraEncoder.fix_size method module_theora.html
 theora.TheoraEncoder class module_theora.html
-theora.Theora.trim_offset method module_theora.html
 theora.Theora.aspect_ratio attribute module_theora.html
 theora.Theora.width attribute module_theora.html
 theora.Theora.time attribute module_theora.html
