@@ -34,6 +34,18 @@ $ ./setup.py build_ext --inplace
 $ cd doc
 $ make html
 
+To upload to github, use:
+
+$ cd _build/html
+$ sphinx-to-github
+Processing matches for:  _sources
+Processing matches for:  _static
+$ cd ../../..
+$ git co -b gh-pages
+$ cp -r doc/_build/html/* .
+$ git co -a -m "docs updated"
+
+
 Usage
 -----
 
