@@ -1037,6 +1037,34 @@ cdef class TheoraEncoder:
             raise Exception("Can't compress the matrix.")
         return B
 
+    def write_frame_image(self, image, last=False):
+        """
+        Writes a new frame given as a PIL image.
+
+        The image has to be in the RGB mode.
+
+        Example:
+
+        >>> from theora import TheoraEncoder, VIDEO_DIR
+        >>> from scipy import lena
+        >>> import Image
+        >>> img = Image.fromarray(lena()).convert("RGB")
+        >>> b = TheoraEncoder(VIDEO_DIR+"/b.ogv", img.size[0], img.size[1])
+        >>> b.write_frame_image(img)
+
+        """
+        import Image
+        import numpy
+        # convert from rgb to YCbCr (http://en.wikipedia.org/wiki/YCbCr)
+        # use the ITU-R BT.601 conversion matrix but with full range RGB this
+        # is the same as in JPEG (Jfif specs V1.02) encoding (CCIR 601-256
+        # levels)
+        RGB2YCbCr = [  0.299,     0.587,     0.114,      0,
+                      -0.168736, -0.331264,  0.5,      128,
+                       0.5,      -0.418688, -0.081312, 128 ]
+        image = image.convert('RGB', RGB2YCbCr)
+        return self.write_frame_array(numpy.asarray(image), last)
+
     def write_frame_array(self, A, last=False):
         """
         Writes another frame to outfile.
