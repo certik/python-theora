@@ -918,7 +918,7 @@ cdef class TheoraEncoder:
     cdef ogg_stream_state _os
     cdef ogg_packet _op
 
-    def __init__(self, f, width, height, bitrate=None, quality=None):
+    def __init__(self, f, width, height, bitrate=None, quality=None, framerate=(25, 1)):
         if isinstance(f, (str, unicode)):
             self._outfile = open(f, "w")
         else:
@@ -934,8 +934,8 @@ cdef class TheoraEncoder:
         self._ti.pic_y = 0
         # the encoder doesn't support anything else besides 4:2:0 currently
         self._ti.pixel_fmt = TH_PF_420
-        self._ti.fps_numerator = 25
-        self._ti.fps_denominator = 1
+        self._ti.fps_numerator = framerate[0]
+        self._ti.fps_denominator = framerate[1]
         if bitrate is not None:
             self._ti.target_bitrate = bitrate
         if quality is not None:
