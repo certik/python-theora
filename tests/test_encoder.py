@@ -1,4 +1,6 @@
 from theora import Theora, TheoraEncoder, test_files, VIDEO_DIR
+from scipy import lena
+import Image
 
 def test_recoding1():
     a = Theora(test_files[1])
@@ -15,3 +17,8 @@ def test_recoding2():
     while a.read_frame() and a.time < 0.90:
         data = a.get_frame_data()
         b.write_frame_data(data)
+
+def test_write_frame_image():
+    img = Image.fromarray(lena()).convert("RGB")
+    b = TheoraEncoder(VIDEO_DIR+"/b.ogv", img.size[0], img.size[1])
+    b.write_frame_image(img)
